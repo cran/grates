@@ -1,0 +1,107 @@
+## ---- include = FALSE---------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 7,
+  fig.height = 5
+)
+
+## ----setup, message=FALSE-----------------------------------------------------
+library(grates)
+library(ggplot2)
+library(outbreaks)
+library(dplyr)
+
+## ----yrwkdemo-----------------------------------------------------------------
+# create weekday names
+wdays <- weekdays(as.Date(as_yrwk(as.Date("2020-01-01"), firstday = 1L)) + 0:6)
+wdays <- setNames(1:7, wdays)
+
+# example of how weeks vary by firstday over December and January
+dates <- as.Date("2020-12-29") + 0:5
+dat <- lapply(wdays, function(x) as_yrwk(dates, x))
+bind_cols(dates = dates, dat)
+
+## ----yrwkconventions, error=TRUE----------------------------------------------
+dates <- as.Date("2021-01-01") + 0:30
+weeks <- as_yrwk(dates, firstday = 5) # firstday = 5 to match first day of year
+head(weeks, 8)
+str(weeks)
+dat <- tibble(dates, weeks)
+
+# addition of wholenumbers will add the corresponding number of weeks to the object
+dat %>% 
+  mutate(plus4 = weeks + 4)
+
+# addition of two yrwk objects will error as it is unclear what the intention is
+dat %>% 
+  mutate(plus4 = weeks + weeks)
+
+# Subtraction of wholenumbers works similarly to addition
+dat %>% 
+  mutate(minus4 = weeks - 4)
+
+# Subtraction of two yrwk objects gives the difference in weeks between them
+dat %>% 
+  mutate(plus4 = weeks + 4, difference = plus4 - weeks)
+
+# weeks can be combined if they have the same firstday but not otherwise
+wk1 <- as_yrwk("2020-01-01")
+wk2 <- as_yrwk("2021-01-01")
+c(wk1, wk2)
+wk3 <- as_yrwk("2020-01-01", firstday = 2)
+c(wk1, wk3)
+
+## ----yrwkplots----------------------------------------------------------------
+dat <- ebola_sim_clean$linelist
+
+dat %>%
+  mutate(date = as_yrwk(date_of_infection)) %>% 
+  count(date, name = "cases") %>% 
+  na.omit() %>% 
+  ggplot(aes(date, cases)) + geom_col() + theme_bw() + xlab("")
+
+## ----yrothers-----------------------------------------------------------------
+# create weekday names
+dates <- seq(from = as.Date("2020-01-01"), to = as.Date("2021-12-01"), by = "1 month")
+
+as_yrmon(dates)
+as_yrqtr(dates)
+as_yr(dates)
+as_yrmon(dates[1]) + 0:1
+as_yrqtr(dates[1]) + 0:1
+as_yr(dates[1]) + 0:1
+
+## ----yrothersplots------------------------------------------------------------
+dat %>%
+  mutate(date = as_yrmon(date_of_infection)) %>% 
+  count(date, name = "cases") %>% 
+  na.omit() %>% 
+  ggplot(aes(date, cases)) + geom_col() + theme_bw() + xlab("")
+
+dat %>%
+  mutate(date = as_yrqtr(date_of_infection)) %>% 
+  count(date, name = "cases") %>% 
+  na.omit() %>% 
+  ggplot(aes(date, cases)) + geom_col() + theme_bw() + xlab("")
+
+dat %>%
+  mutate(date = as_yr(date_of_infection)) %>% 
+  count(date, name = "cases") %>% 
+  na.omit() %>% 
+  ggplot(aes(date, cases)) + geom_col() + theme_bw() + xlab("") + scale_x_yr(n = 2)
+
+## ----period-------------------------------------------------------------------
+dat %>%
+  mutate(date = as_period(date_of_infection, interval = "2 weeks")) %>% 
+  count(date, name = "cases") %>% 
+  na.omit() %>% 
+  ggplot(aes(date, cases)) + geom_col() + theme_bw() + xlab("")
+
+dat %>%
+  mutate(date = as_period(date_of_infection, interval = 28)) %>% 
+  count(date, name = "cases") %>% 
+  na.omit() %>% 
+  ggplot(aes(date, cases)) + geom_col() + theme_bw() + xlab("")
+
