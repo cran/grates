@@ -1,3 +1,43 @@
+test_that("period constructor", {
+  dat <- c(0, 7, 14, 21)
+  datesw <- seq.Date(from = as.Date("1970-01-01"), length.out = 4, by = 7)
+  expect_equal(as.Date(period(dat, n = 7)), datesw)
+  expect_error(period(dat, n = -1L))
+})
+
+
+test_that("formatting", {
+  dat <- c(0, 7, 14, 21)
+  expect_identical(
+    format(period(dat, n = 7)),
+    c(
+      "1970-01-01 to 1970-01-07",
+      "1970-01-08 to 1970-01-14",
+      "1970-01-15 to 1970-01-21",
+      "1970-01-22 to 1970-01-28"
+    )
+  )
+  expect_identical(format(period()), character())
+
+  expect_snapshot_output(print(period(dat)))
+  # <grates_period[4]>
+  # [1] 1970-01-01 1970-01-08 1970-01-15 1970-01-22
+})
+
+test_that("pre-epoch dates work", {
+  dates <- seq.Date(from = as.Date("1900-01-01"), length.out = 4, by = 7)
+  dates2 <- seq.Date(from = as.Date("1900-01-01") - 28, length.out = 4, by = 7)
+  expect_equal(as.Date(as_period(dates, n=7, origin = as.integer(as.Date("1900-01-01")))), dates)
+  expect_equal(as.Date(as_period(dates, n=7, origin = as.integer(as.Date("1900-01-01"))) - 4), dates2)
+
+  expect_snapshot(as_period(dates, n = 7, origin = as.integer(as.Date("1900-01-01"))))
+  # this should look like:
+  # <grates_period[4]>
+  # [1] 1900-01-01 to 1900-01-07 1900-01-08 to 1900-01-14 1900-01-15 to 1900-01-21
+  # [4] 1900-01-22 to 1900-01-28
+})
+
+
 # as_period -----------------------------------------------------------------
 
 test_that("as_period errors correctly", {
@@ -11,14 +51,13 @@ test_that("as_period errors correctly", {
 
 
 test_that("period output looks correct", {
-  dates <- as.Date("2020-01-01") + 0:61
-  dat <- as_period(dates, interval = 2)
-  expected <- rep(dates[seq(1, 61, 2)], each = 2)
-  expect_equal(as.Date(dat), expected)
+  dates <- as.Date("2020-01-01") + (0:61)
+  dat <- as_period(dates, n = 2, origin = as.integer(as.Date("2020-01-01")))
+  expect_equal(as.Date(dat), rep(dates[c(TRUE,FALSE)], each = 2))
 
   expect_snapshot_output(print(dat))
   # this should look like:
-  # <period> interval = 2 days
+  # <grate_period: n = 2>
   #  [1] "2020-01-01 to 2020-01-02" "2020-01-01 to 2020-01-02"
   #  [3] "2020-01-03 to 2020-01-04" "2020-01-03 to 2020-01-04"
   #  [5] "2020-01-05 to 2020-01-06" "2020-01-05 to 2020-01-06"
@@ -88,42 +127,23 @@ test_that("period output looks correct", {
 
 })
 
-test_that("period output looks correct - character intervals", {
-
-  dates <- as.Date("2020-01-01") + 0:365
-  dat_weeks <- table(as_period(dates, interval = "2 wednesday weeks"))
-  attributes(dat_weeks) <- NULL
-  dat_months <- table(as_period(dates, interval = "2 months"))
-  attributes(dat_months) <- NULL
-  dat_quarters <- table(as_period(dates, interval = "2 quarters"))
-  attributes(dat_quarters) <- NULL
-
-  expect_equal(dat_weeks, c(rep(14, 26), 2))
-  expect_equal(dat_months, c(60, 61, 61, 62, 61, 61))
-  expect_equal(dat_quarters, c(182, 184))
-
-})
-
-
 
 test_that("as_period.POSIXlt works as expected", {
 
   nz <- as.POSIXlt("2021-02-04", tz = "NZ")
-  result <- as.POSIXlt(
-    as_period(
-      nz,
-      firstdate = as.POSIXlt("2021-02-03", tz = "NZ"),
-      interval = 2
-    ),
-    tz = "NZ")
+  result <- as_period(nz, origin = as.integer(as.Date("2021-02-03")),  n = 2)
+  result <- as.POSIXlt(result, tz = "NZ")
 
-  expect_equal(result, as.POSIXlt("2021-02-03", tz = "NZ"))
+  expected <- as.POSIXlt("2021-02-03", tz = "NZ")
+  expected$gmtoff <- result$gmtoff <- NA_integer_ # HACK but ok for this test
+  attr(expected, "tzone") <- attr(result, "tzone") <- "NZ" # HACK but ok for this test
+
+  expect_equal(result, expected)
 
   dat <- as.POSIXlt("2021-01-04", tz = "UTC")
-  res <- as_period(dat, interval = 2)
-
-  expect_equal(res, as_period(as.Date("2021-01-04"), interval = 2))
-  expect_equal(as.Date(res), as.Date("2021-01-04"))
+  res <- as_period(dat, n = 2, origin = as.integer(as.Date("2021-01-01")))
+  expect_equal(res, as_period(as.Date("2021-01-04"), n = 2, origin = as.integer(as.Date("2021-01-01"))))
+  expect_equal(as.Date(res), as.Date("2021-01-03"))
 
 })
 
@@ -131,25 +151,26 @@ test_that("as_period.POSIXlt works as expected", {
 test_that("as_period.POSIXct works as expected", {
   nz <- as.POSIXct(as.POSIXlt("2021-02-04", tz = "NZ"), tz = "NZ")
   result <- as.POSIXct(
-    as_period(nz, firstdate = as.POSIXct(as.POSIXlt("2021-02-03")), interval = 2),
+    as_period(nz, origin = as.integer(as.Date("2021-02-03")), n = 2),
     tz = "NZ"
   )
-  expect_equal(result, as.POSIXct(as.POSIXlt("2021-02-03", tz = "NZ"), tz = "NZ"))
-  expect_equal(as.Date(result, tz = tzone(result)), as.Date("2021-02-03"))
+  expected <- as.POSIXct(as.POSIXlt("2021-02-03", tz = "NZ"), tz = "NZ")
+  expect_equal(result, expected)
+  expect_equal(as.Date(result, attr(result, "tzone")), as.Date("2021-02-03"))
 })
 
 
 test_that("as_period.character works as expected", {
   dat <- "2021-01-04"
-  res <- as_period(dat, interval = 2)
+  res <- as_period(dat, n = 2, origin = as.integer(as.Date(dat)))
   expect_equal(as.Date(res), as.Date("2021-01-04"))
 })
 
 
 test_that("as_period.factor works as expected", {
   dat <- as.factor("2021-01-04")
-  res <- as_period(dat, interval = 3)
-  expect_equal(as.Date(res), as.Date("2021-01-04"))
+  res <- as_period(dat, n = 3, origin = as.integer(as.Date(dat)) - 1)
+  expect_equal(as.Date(res), as.Date("2021-01-03"))
 })
 
 
@@ -159,29 +180,30 @@ test_that("as_period.factor works as expected", {
 
 test_that("as.POSIXct.period works as expected", {
   dat <- "2021-01-04"
-  res <- as.POSIXct(as_period(dat, firstdate = "2021-01-03", interval = 2))
-  expect_equal(res, as.POSIXct(as.POSIXlt("2021-01-03", tz = "UTC")))
+  res <- as.POSIXct(as_period(dat, origin = as.integer(as.Date("2021-01-03")), n = 2))
+  expect_equal(res, as.POSIXct(as.POSIXlt("2021-01-03"), tz = ""))
 })
 
 
 test_that("as.POSIXlt.period works as expected", {
   dat <- "2021-01-04"
-  res <- as.POSIXlt(as_period(dat, firstdate = "2021-01-03", interval = 2))
-  expect_equal(res, as.POSIXlt("2021-01-03", tz = "UTC"))
+  res <- as.POSIXlt(as_period(dat, origin = as.integer(as.Date("2021-01-03")), n = 2))
+  expect_s3_class(res, "POSIXlt")
+  expect_equal(julian(res), julian(as.POSIXlt("2021-01-03")))
 })
 
 
 test_that("as.character.period works as expected", {
   dat <- "2020-12-28"
-  res <- as.character(as_period(dat, interval = 3))
+  res <- as.character(as_period(dat, n = 3))
   expect_equal(res, "2020-12-28 to 2020-12-30")
 })
 
 test_that("as.list.period works as expected", {
-  dat <- as_period(c(a = "2020-12-28", b = "2021-01-04"), interval = 2)
+  dat <- as_period(c("2020-12-28", "2021-01-04"), n = 2)
   res <- list(
-    a = as_period("2020-12-28", interval = 2),
-    b = as_period("2021-01-04", firstdate = "2020-12-28", interval = 2))
+    as_period("2020-12-28", n = 2),
+    as_period("2021-01-04", origin = as.integer(as.Date("2020-12-28")), n = 2))
   expect_equal(res, as.list(dat))
 })
 -------------------------------------------------------------------------
@@ -191,16 +213,16 @@ test_that("as.list.period works as expected", {
   # accessors ---------------------------------------------------------------
 
 test_that("accessors error when they should", {
-  expect_error(get_interval("bob"))
+  expect_error(get_n("bob"))
 })
 
 test_that("accessors work", {
   dat <- as_period(
     as.Date("2020-12-28"),
-    firstdate = as.Date("2020-12-26"),
-    interval = 55
+    origin = as.integer(as.Date("2020-12-26")),
+    n = 55
   )
-  expect_equal(get_interval(dat), 55)
+  expect_equal(get_n(dat), 55)
 })
 # -------------------------------------------------------------------------
 
@@ -209,7 +231,7 @@ test_that("accessors work", {
 # is_period -----------------------------------------------------------------
 
 test_that("is_period/grate works", {
-  dat <- as_period(Sys.Date(), interval = 2)
+  dat <- as_period(Sys.Date(), n = 2)
   expect_true(is_period(dat))
   expect_false(is_period("bob"))
   expect_true(is_grate(dat))
@@ -220,20 +242,14 @@ test_that("is_period/grate works", {
 
 # other methods -----------------------------------------------------------
 
-test_that("is.numeric works", {
-  dat <- as_period(Sys.Date(), interval = 2)
-  expect_false(is.numeric(dat))
-})
-
-
 test_that("subsetting works", {
   x <- as.Date("2021-01-15")
-  dat <- as_period(x, interval = 31) + 0:1
-  expect_equal(dat[1], as_period(x, interval = 31))
-  expect_equal(dat[[2]], as_period(x + 31, interval = 31, firstdate = as.Date("2021-01-15")))
+  dat <- as_period(x, n = 31) + 0:1
+  expect_equal(dat[1], as_period(x, n = 31))
+  expect_equal(dat[[2]], as_period(x + 31, n = 31))
 
   dat[1] <- dat[2]
-  expect_equal(dat[1], as_period(x + 31, interval = 31, firstdate = as.Date("2021-01-15")))
+  expect_equal(dat[1], as_period(x + 31, n = 31))
 
   expect_error(dat[1] <- "bob")
   expect_error(dat[1] <- as_yrwk(x))
@@ -242,8 +258,8 @@ test_that("subsetting works", {
 
 test_that("combine errors correctly", {
   x <- Sys.Date()
-  dat1 <- as_period(x, interval = 2)
-  dat2 <- as_yrwk(x)
+  dat1 <- as_period(x, n = 2)
+  dat2 <- as_yearweek(x)
   expect_error(c(dat1, "bob"))
   expect_error(c(dat1, dat2))
 })
@@ -251,8 +267,8 @@ test_that("combine errors correctly", {
 
 test_that("combine works", {
   x <- as.Date("2020-05-26")
-  dat <- as_period(x, interval = 2)
-  expect_equal(c(dat, dat), as_period(c(x, x), interval = 2))
+  dat <- as_period(x, n = 2)
+  expect_equal(c(dat, dat), as_period(c(x, x), n = 2))
 })
 
 
@@ -260,7 +276,7 @@ test_that("combine works", {
 # ops ---------------------------------------------------------------------
 test_that("comparison operators work", {
   x <- Sys.Date()
-  dat1 <- as_period(x, interval = 2)
+  dat1 <- as_period(x, n = 2)
 
   expect_true(dat1 == dat1)
   expect_true(dat1 <= dat1 + 1)
@@ -272,7 +288,7 @@ test_that("comparison operators work", {
 
 test_that("addition operation works as expected", {
   x <- as.Date("2021-01-05")
-  dat1 <- as_period(x, interval = 2)
+  dat1 <- as_period(x, n = 2)
   dat2 <- dat1 + 0:1
   y <- as.Date("2021-01-05")
 
@@ -286,12 +302,11 @@ test_that("addition operation works as expected", {
 
 test_that("subtraction operation works as expected", {
   x <- as.Date("2021-01-05")
-  dat1 <- as_period(x, interval = 2)
+  dat1 <- as_period(x, n = 2)
   dat2 <- dat1 - 0:1
   y <- as.Date("2021-01-05")
 
   expect_equal(as.Date(dat2), c(y, y - 2))
-  expect_error(dat2 - dat1)
   expect_error(1 - dat1)
   expect_error(-dat1)
   expect_error(dat1 - 1.5)
@@ -300,7 +315,7 @@ test_that("subtraction operation works as expected", {
 
 
 test_that("Other operations error", {
-  x <- as_period(as.Date("2021-01-05"), interval = 2)
+  x <- as_period(as.Date("2021-01-05"), n = 2)
 
   expect_error(dat * 3)
   expect_error(dat / 3)
@@ -314,7 +329,7 @@ test_that("Other operations error", {
 
 
 test_that("Maths works", {
-  x <- as_period(as.Date("2021-01-05", interval = 2))
+  x <- as_period(as.Date("2021-01-05", n = 2))
   dat <- c(x + 0:1, NA)
   expect_equal(is.nan(dat), c(FALSE, FALSE, FALSE))
   expect_equal(is.finite(dat), c(TRUE, TRUE, FALSE))
