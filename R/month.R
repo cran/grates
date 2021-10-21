@@ -191,12 +191,12 @@ vec_cast.grates_month.grates_month <- function(x, to, ...) {
   # check compatibility of n
   nx <- attr(x, "n")
   nto <- attr(to, "n")
-  if (nx != nto) stop_incompatible_cast(x, to)
+  if (nx != nto) abort("Can't cast <grates_month>'s with different `n`")
 
   # check compatibility of the origin
   ox <- attr(x, "origin")
   oto <- attr(to, "origin")
-  if (ox != oto) stop_incompatible_cast(x, to)
+  if (ox != oto) abort("Can't cast <grates_month>'s with different `origin`")
 
   x
 }
@@ -308,7 +308,7 @@ as.numeric.grates_month <- function(x, ...) {
 as.integer.grates_month <- function(x, ...) {
   check_dots_empty()
   out <- as.integer(unclass(x))
-  unclass(x)
+  setNames(out, names(x))
 }
 
 #' @export

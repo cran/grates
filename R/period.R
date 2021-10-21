@@ -194,12 +194,12 @@ vec_cast.grates_period.grates_period <- function(x, to, ...) {
   # check compatibility of n
   nx <- attr(x, "n")
   nto <- attr(to, "n")
-  if (nx != nto) stop_incompatible_cast(x, to)
+  if (nx != nto) abort("Can't cast <grates_period>'s with different `n`")
 
   # check compatibility of the origin
   ox <- attr(x, "origin")
   oto <- attr(to, "origin")
-  if (ox != oto) stop_incompatible_cast(x, to)
+  if (ox != oto) abort("Can't cast <grates_period>'s with different `origin`")
 
   x
 }
@@ -279,26 +279,30 @@ as.list.grates_period <- function(x, ...) {
   check_dots_empty()
   n <- attr(x, "n")
   origin <- attr(x, "origin")
-  lapply(unclass(x), new_period, n = n, origin = origin)
+  out <- lapply(unclass(x), new_period, n = n, origin = origin)
+  setNames(out, names(x))
 }
 
 #' @export
 as.double.grates_period <- function(x, ...) {
   check_dots_empty()
-  as.double(unclass(x))
+  out <- as.double(unclass(x))
+  setNames(out, names(x))
 }
 
 #' @export
 as.numeric.grates_period <- function(x, ...) {
   check_dots_empty()
-  as.numeric(unclass(x))
+  out <- as.numeric(unclass(x))
+  setNames(out, names(x))
 }
 
 #' @export
 as.integer.grates_period <- function(x, ...) {
   check_dots_empty()
   attributes(x) <- NULL
-  unclass(x)
+  out <- unclass(x)
+  setNames(out, names(x))
 }
 
 #' @export
