@@ -1,136 +1,256 @@
-# setup -------------------------------------------------------------------
 save_png <- function(code, width = 400, height = 400) {
-  path <- tempfile(fileext = ".png")
-  png(path, width = width, height = height)
-  on.exit(dev.off())
-  print(code)
-  path
+    path <- tempfile(fileext = ".png")
+    png(path, width = width, height = height)
+    on.exit(dev.off())
+    print(code)
+    path
 }
 
 expect_snapshot_plot <- function(name, code) {
-  skip_if_not_installed("ggplot2", "2.0.0")
-  library(ggplot2)
-  skip_on_os(c("windows", "mac"))
-  skip_on_ci()
-  path <- save_png(code)
-  expect_snapshot_file(path, paste0(name, ".png"))
-}
+    skip_if_not_installed("ggplot2", "2.0.0")
+    skip_on_os("windows", "mac")
+    skip_on_ci()
+    name <- paste0(name, ".png")
 
-load_dat <- function() {
-  skip_if_not_installed("outbreaks")
-  library(outbreaks)
-  skip_if_not_installed("dplyr")
-  library(dplyr)
-  skip_if_not_installed("ggplot2", "2.0.0")
-  library(ggplot2)
-  outbreaks::ebola_sim_clean$linelist
+    # Announce the file before touching `code`. This way, if `code`
+    # unexpectedly fails or skips, testthat will not auto-delete the
+    # corresponding snapshot file.
+    announce_snapshot_file(name = name)
+
+    path <- save_png(code)
+    expect_snapshot_file(path, name)
 }
-# -------------------------------------------------------------------------
 
 test_that("yearweek plotting works", {
-  dat <- load_dat()
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
 
-  yearweek_monday <-
-    dat %>%
-    mutate(date = as_yearweek(date_of_infection, firstday = 1)) %>%
-    count(date, name = "cases") %>%
-    na.omit() %>%
-    ggplot(aes(date, cases)) + geom_col(width = 1, colour = "white") + theme_bw() + xlab("")
+    yearweek_monday <-
+        dat |>
+        dplyr::mutate(date = as_yearweek(date_of_infection, firstday = 1L)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit() |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1, colour = "white") +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("")
 
-  yearweek_thursday <-
-    dat %>%
-    mutate(date = as_yearweek(date_of_infection, firstday = 4)) %>%
-    count(date, name = "cases") %>%
-    na.omit() %>%
-    ggplot(aes(date, cases)) + geom_col(width = 1, colour = "white") + theme_bw() + xlab("")
+    yearweek_thursday <-
+        dat |>
+        dplyr::mutate(date = as_yearweek(date_of_infection, firstday = 4L)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit() |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("")
 
-  expect_snapshot_plot("yearweek_monday", yearweek_monday)
-  expect_snapshot_plot("yearweek_thursday", yearweek_thursday)
+    expect_snapshot_plot("yearweek_monday", yearweek_monday)
+    expect_snapshot_plot("yearweek_thursday", yearweek_thursday)
 })
 
 
-test_that("month plotting works", {
-  dat <- load_dat()
+test_that("isoweek plotting works", {
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
 
-  month_dat <-
-    dat %>%
-    mutate(date = as_month(date_of_infection)) %>%
-    count(date, name = "cases") %>%
-    na.omit()
+    isoweek <-
+        dat |>
+        dplyr::mutate(date = as_isoweek(date_of_infection)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit() |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1, colour = "white") +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("")
 
-  month <-
-    month_dat %>%
-    ggplot(aes(date, cases)) +
-    geom_col(width = 1, colour = "white") +
-    scale_x_grates_month(n.breaks = 4, n = 1, origin = 0) +
-    theme_bw() +
-    xlab("")
 
-  month2 <-
-    month_dat %>%
-    ggplot(aes(date, cases)) + geom_col(width = 1, colour = "white") + theme_bw() + xlab("") +
-    scale_x_grates_month(n.breaks = 4, format = NULL, n = 1, origin = 0)
-
-  expect_snapshot_plot("month", month)
-  expect_snapshot_plot("month2", month2)
+    expect_snapshot_plot("isoweek", isoweek)
 })
 
 
-test_that("quarter plotting works", {
-  dat <- load_dat()
+test_that("epiweek plotting works", {
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
 
-  quarter <-
-    dat %>%
-    mutate(date = as_quarter(date_of_infection)) %>%
-    count(date, name = "cases") %>%
-    na.omit() %>%
-    ggplot(aes(date, cases)) +
-    geom_col(width = 1, colour = "white") +
-    scale_x_grates_quarter(n.breaks = 8) +
-    theme_bw() +
-    xlab("")
+    epiweek <-
+        dat |>
+        dplyr::mutate(date = as_epiweek(date_of_infection)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit() |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("")
 
-  expect_snapshot_plot("quarter", quarter)
+
+    expect_snapshot_plot("epiweek", epiweek)
+})
+
+test_that("yearmonth plotting works", {
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
+
+    month_dat <-
+        dat |>
+        dplyr::mutate(date = as_yearmonth(date_of_infection)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit()
+
+    month <-
+        month_dat |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1, colour = "white") +
+            scale_x_grates_yearmonth(n.breaks = 4) +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("")
+
+    month2 <-
+        month_dat |>
+            ggplot2::ggplot(ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1, colour = "white") +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("") +
+            scale_x_grates_yearmonth(n.breaks = 4, format = "%Y-%m-%d")
+
+    expect_snapshot_plot("yearmonth", month)
+    expect_snapshot_plot("yearmonth2", month2)
+})
+
+test_that("yearquarter plotting works", {
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
+
+    quarter_dat <-
+        dat |>
+        dplyr::mutate(date = as_yearquarter(date_of_infection)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit()
+
+    quarter <-
+        ggplot2::ggplot(quarter_dat, ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1, colour = "white") +
+            scale_x_grates_yearquarter(n.breaks = 8) +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("")
+
+    quarter2 <-
+        ggplot2::ggplot(quarter_dat, ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        scale_x_grates_yearquarter(n.breaks = 8, format = "%Y-%m-%d") +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("")
+
+    expect_snapshot_plot("yearquarter", quarter)
+    expect_snapshot_plot("yearquarter2", quarter2)
 })
 
 
 test_that("year plotting works", {
-  dat <- load_dat()
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
 
-  year <-
-    dat %>%
-    mutate(date = as_year(date_of_infection)) %>%
-    count(date, name = "cases") %>%
-    na.omit() %>%
-    ggplot(aes(date, cases)) +
-    geom_col(width = 1, colour = "white") +
-    scale_x_grates_year(n.breaks = 2) +
-    theme_bw() +
-    xlab("")
+    year_dat <-
+        dat |>
+        dplyr::mutate(date = as_year(date_of_infection)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit()
 
-  expect_snapshot_plot("year", year)
+    year <-
+        ggplot2::ggplot(year_dat, ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        scale_x_grates_year(n.breaks = 2) +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("")
+
+    year2 <-
+        ggplot2::ggplot(year_dat, ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        scale_x_grates_year(n.breaks = 2, format = "%Y-%m-%d") +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("")
+
+    expect_snapshot_plot("year", year)
+    expect_snapshot_plot("year2", year2)
+})
+
+test_that("month plotting works", {
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
+
+    month_dat <-
+        dat |>
+        dplyr::mutate(date = as_month(date_of_infection, n = 2L)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit()
+
+    month <-
+        month_dat |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        scale_x_grates_month(n.breaks = 4, n = 2) +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("")
+
+    month2 <-
+        month_dat |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+        ggplot2::geom_col(width = 1, colour = "white") +
+        ggplot2::theme_bw() +
+        ggplot2::xlab("") +
+        scale_x_grates_month(n.breaks = 4, n = 2, format = NULL) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
+
+
+    expect_snapshot_plot("month", month)
+    expect_snapshot_plot("month2", month2)
 })
 
 test_that("period plotting works", {
-  dat <- load_dat()
+    skip_if_not_installed("outbreaks")
+    skip_if_not_installed("dplyr")
+    skip_if_not_installed("ggplot2", "2.0.0")
+    dat <- outbreaks::ebola_sim_clean$linelist
 
-  two_weeks <-
-    dat %>%
-    mutate(date = as_period(date_of_infection,n = 14)) %>%
-    count(date, name = "cases") %>%
-    na.omit() %>%
-    ggplot(aes(date, cases)) + geom_col(width = 14, colour = "white") + theme_bw() + xlab("")
+    two_weeks <-
+        dat |>
+        dplyr::mutate(date = as_period(date_of_infection, n = 14)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit() |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1L, colour = "white") +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("")
 
-  expect_snapshot_plot("two_weeks", two_weeks)
+    expect_snapshot_plot("two_weeks", two_weeks)
 
-  twentyeight_days <-
-    dat %>%
-    mutate(date = as_period(date_of_infection, n=28)) %>%
-    count(date, name = "cases") %>%
-    na.omit() %>%
-    ggplot(aes(date, cases)) + geom_col(width = 28, colour = "white") + theme_bw() + xlab("")
+    twentyeight_days <-
+        dat |>
+        dplyr::mutate(date = as_period(date_of_infection, n = 28)) |>
+        dplyr::count(date, name = "cases") |>
+        na.omit() |>
+        ggplot2::ggplot(ggplot2::aes(date, cases)) +
+            ggplot2::geom_col(width = 1L, colour = "white") +
+            ggplot2::theme_bw() +
+            ggplot2::xlab("") +
+            scale_x_grates_period(n.breaks = 7L, n = 28, offset = 0L) +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
 
-  expect_snapshot_plot("twentyeight_days", twentyeight_days)
+    expect_snapshot_plot("twentyeight_days", twentyeight_days)
 
 
 })

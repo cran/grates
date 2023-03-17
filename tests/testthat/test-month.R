@@ -1,308 +1,312 @@
-test_that("month constructor", {
-  dat <- 0:11
-  dates <- seq.Date(
-    from = as.Date("1970-01-01"),
-    to = as.Date("1970-12-01"),
-    by = "month"
-  )
+test_that("month constructor and coercion to date works", {
+    dates <- seq.Date(from = as.Date("1970-01-01"), length.out = 6L, by = "2 months")
+    storage.mode(dates) <- "double" # needed for R <= 4.1.3
+    dat <- new_month(0:5, n=2L)
+    dates5 <- seq.Date(from = as.Date("1970-01-01"), length.out = 6L, by = "5 months")
+    storage.mode(dates5) <- "double" # needed for R <= 4.1.3
+    dat5 <- new_month(0:5, n=5L)
 
-  expect_equal(as.Date(month(dat)), dates)
-  expect_error(month(dat, n = 0))
-  expect_error(month(dat, n = 2))
-  expect_error(month(dat[c(TRUE,FALSE)], n = 2, origin = 1))
+    expect_identical(as.Date(dat), dates)
+    expect_identical(as.Date(dat5), dates5)
+
+    # formatting --------------------------------------------------------------
+    dates2 <- seq.Date(from = as.Date("1970-01-01"), length.out = 7L, by = "2 months")
+    storage.mode(dates2) <- "double" # needed for R <= 4.1.3
+    dates2 <- dates2[-1L]
+    expect_identical(
+        format(dat),
+        sprintf("%s to %s", format(dates, "%Y-%b"), format(dates2-1, "%Y-%b"))
+    )
+    expect_identical(format(new_month(n=2L)), character())
+})
+
+test_that("month, pre-epoch dates work", {
+    dates <- seq.Date(from = as.Date("1900-01-01"), length.out = 3L, by = "2 months")
+    storage.mode(dates) <- "double" # needed for R <= 4.1.3
+    expect_identical(as.Date(as_month(dates, n = 2L)), dates)
+})
+
+test_that("month, POSIXlt coercion works", {
+    nz <- as.POSIXlt("2021-01-04 02:00:00", tz = "NZ")
+    utc <- as.POSIXlt("2021-01-01 00:00:00", tz = "UTC")
+    result <- as.POSIXlt(as_month(nz, n = 3L))
+    expect_identical(result, utc)
+
+    dat <- "2021-01-01"
+    pos <- as.POSIXlt("2021-01-04", tz = "UTC")
+    res1 <- as_month(pos, n = 3L)
+
+    expect_identical(as.Date(res1), as.Date(dat))
+
+    dat <- "2021-01-01"
+    res <- as.POSIXlt(as_month(dat, n = 3L))
+    expect_s3_class(res, "POSIXlt")
+    expect_identical(julian(res), julian(as.POSIXlt(dat, tz = "UTC")))
+    expect_error(
+        as.POSIXlt(as_month(dat, n = 3L), tz = "GMT"),
+        "<grates_month> objects can only be converted to UTC. If other timezones are required, first convert to <Date> and then proceed as desired.",
+        fixed = TRUE
+    )
+})
+
+test_that("month, accessor works", {
+    dat <- as.Date("2021-01-01")
+    expect_identical(get_n(as_month(dat, n = 5L)), 5L)
+})
+
+test_that("month, POSIXct coercion works", {
+    nz <- as.POSIXct(as.POSIXlt("2021-01-04", tz = "NZ"))
+    dat <- as_month(nz, n = 2L)
+    result <- as.POSIXct(dat)
+    expect_identical(result, as.POSIXct(as.POSIXlt("2021-01-01", tz = "UTC")))
+
+    pos <- as.POSIXct(as.POSIXlt("2021-01-04", tz = "UTC"))
+    res1 <- as_month(pos, n = 2L)
+    expect_identical(as.Date(res1), as.Date("2021-01-01"))
+
+    dat <- "2021-01-01"
+    res <- as.POSIXct(as_month(dat, n = 2L))
+    expect_identical(res, as.POSIXct(as.POSIXlt(dat), tz = "UTC"))
+    expect_error(
+        as.POSIXct(as_month(dat, n = 2L), tz = "GMT"),
+        "<grates_month> objects can only be converted to UTC. If other timezones are required, first convert to <Date> and then proceed as desired.",
+        fixed = TRUE
+    )
+})
+
+test_that("month, character coercion works", {
+    dat <- "2021-01-04"
+    res <- as_month(dat, n = 6L)
+    expect_identical(as.Date(res), as.Date("2021-01-01"))
+
+    dat <- as.factor("2021-01-04")
+    res <- as_month(dat, n = 3L)
+    expect_identical(as.Date(res), as.Date("2021-01-01"))
+
+    x <- "2020-12-28"
+    dat <- as_month("2020-12-28", n = 2L)
+    res <- as.character(dat)
+    expect_identical(
+        res,
+        sprintf("%s to %s", format(as.Date(x)-30L, "%Y-%b"), format(as.Date(x), "%Y-%b"))
+    )
+})
+
+test_that("as_month, misc errors and warnings", {
+    expect_error(
+        as_month(TRUE),
+        "Not implemented for class [logical].",
+        fixed = TRUE
+    )
+
+    expect_error(
+        as_month(Sys.Date(), n = 1L),
+        "`n` must be greater than 1. If single month groupings are required please use `as_yearmonth()`.",
+        fixed = TRUE
+    )
+
+    expect_error(as_month("bob", n = 2L))
 })
 
 
-test_that("formatting", {
-
-  dat <- 0:3
-  dates <- seq.Date(
-    from = as.Date("1970-01-01"),
-    to = as.Date("1970-04-01"),
-    by = "month"
-  )
-
-  expect_identical(format(month(dat)), format.Date(dates, "%Y-%b"))
-  expect_identical(format(month(dat), "%Y-%m"), format.Date(dates, "%Y-%m"))
-  expect_identical(format(month()), character())
-
-  expect_snapshot(print(month(dat)))
-  # this should look like:
-  #  <grates_month[4]>
-  #  [1] 1970-Jan 1970-Feb 1970-Mar 1970-Apr
+test_that("month, as.list works", {
+    dat <- as_month(c("2020-12-28", "2021-01-04"), n = 7L)
+    res <- list(as_month("2020-12-28", n = 7L), as_month("2021-01-04", n = 7L))
+    expect_identical(res, as.list(dat))
 })
 
-
-test_that("pre-epoch dates work", {
-
-  dates <- seq.Date(
-    from = as.Date("1900-02-01"),
-    to = as.Date("1900-12-01"),
-    by = "5 months"
-  )
-  dates5 <- seq.Date(
-    from = as.Date("1900-07-01"),
-    length.out = 3L,
-    by = "5 months"
-  )
-
-  expect_equal(as.Date(as_month(dates)), dates)
-  expect_equal(as.Date(as_month(dates, n = 5L, origin = 1) + 1), dates5)
-  expect_snapshot(as_month(dates))
-  # this should look like:
-  # <grates_month[3]>
-  # [1] 1900-Feb 1900-Jul 1900-Dec
+test_that("month, is_month works", {
+    dat <- as_month(Sys.Date(), n = 2L)
+    expect_true(is_month(dat))
+    expect_false(is_month("bob"))
 })
 
-
-test_that("as_month errors correctly", {
-  expect_error(as_month(TRUE))
-  suppressWarnings(expect_error(as_month("bob")))
-  suppressWarnings(expect_error(as_month("2021-W53")))
+test_that("month, subsetting works", {
+    x <- Sys.Date()
+    dat <- as_month(x, n = 5L) + 0:1
+    dat <- setNames(dat, c("a", "b"))
+    dat2 <- as.Date(dat)
+    expect_identical(dat[1], c(a=as_month(x, n = 5L)))
+    expect_identical(dat[[2]], as_month(dat2[[2]], n = 5L))
+    dat[1] <- as_month(x+33, n = 5L)
+    expect_identical(dat[1], c(a=as_month(x + 33, n = 5L)))
+    dat[[2]] <- dat[[1]]
+    expect_identical(dat[[2]], dat[[1]])
+    expect_error(
+        dat[1] <- "bob",
+        "Can only assign <grates_month> objects in to an <grates_month> object.",
+        fixed = TRUE
+    )
 })
 
-
-test_that("as_month.Date works correctly - n = 1", {
-  start <- as.Date("2020-01-01")
-  dat <- seq.Date(from = start, to = start + 365, by = 1)
-  res <- aggregate(dat, list(as_month(dat)), length)
-
-  expect_equal(res$x, c(31,29,31,30,31,30,31,31,30,31,30,31))
-  expect_equal(
-    as.Date(res[[1]]),
-    seq.Date(from = start, to = start + 365, by = "month")
-  )
-
-  expect_snapshot(print(res))
-  # This should look like:
-  # Group.1  x
-  # 1  2020-Jan 31
-  # 2  2020-Feb 29
-  # 3  2020-Mar 31
-  # 4  2020-Apr 30
-  # 5  2020-May 31
-  # 6  2020-Jun 30
-  # 7  2020-Jul 31
-  # 8  2020-Aug 31
-  # 9  2020-Sep 30
-  # 10 2020-Oct 31
-  # 11 2020-Nov 30
-  # 12 2020-Dec 31
-
-  expect_snapshot(print(unique(res$Group.1)))
-  # This should look like:
-  # <grates_month[12]>
-  # [1] 2020-Jan 2020-Feb 2020-Mar 2020-Apr 2020-May 2020-Jun 2020-Jul 2020-Aug
-  # [9] 2020-Sep 2020-Oct 2020-Nov 2020-Dec
+test_that("month, combine works", {
+    x <- Sys.Date()
+    dat <- as_month(x, n = 2L)
+    expect_identical(c(dat, dat), as_month(c(x, x), n = 2L))
+    expect_error(
+        c(dat, "bob"),
+        "Unable to combine <grates_month> objects with other classes.",
+        fixed = TRUE
+    )
 })
 
+test_that("month operators and math work", {
+    # comparison operators ----------------------------------------------------
+    x <- Sys.Date()
+    dat <- as_month(x, n = 7L)
+    expect_true(dat == dat)
+    expect_false(dat != dat)
+    expect_true(dat == dat)
+    expect_true(dat <= dat + 1)
+    expect_true(dat >= dat - 1)
+    expect_true(dat < dat + 1)
+    expect_true(dat > dat - 1)
+    expect_true(dat != dat + 1)
+    expect_error(
+        dat == TRUE,
+        "Can only compare <grates_month> objects with <grates_month> objects.",
+        fixed = TRUE
+    )
 
-test_that("as_month.Date works correctly - n > 1", {
-  yrs <- rep(2021:2022, each = 12)
-  months <- rep.int(1:12, times = 2)
-  dates <- as.Date(ISOdate(yrs, months, 5L))
-  expected <- seq(from = as.Date("2021-01-01"), to = as.Date("2022-12-01"), by = "2 month")
-  expected <- rep(expected, each = 2)
+    # addition ----------------------------------------------------------------
+    x <- as.Date("2021-01-05")
+    y <- as.Date("2021-01-04")
+    dat1 <- as_month(x, n = 2L)
+    dat2 <- dat1 + 0:1
+    expect_identical(as.Date(dat2), as.Date(c("2021-01-01", "2021-03-01")))
+    expect_identical(dat2, 0:1 + dat1)
+    expect_identical(+dat1, dat1)
+    expect_error(
+        dat1 + 1.5,
+        "Can only add integers to <grates_month> objects.",
+        fixed = TRUE
+    )
+    expect_error(
+        dat1 + dat1,
+        "Cannot add <grates_month> objects to each other.",
+        fixed = TRUE
+    )
 
-  expect_equal(as.Date(as_month(dates, n = 2)), expected)
+    # subtraction -------------------------------------------------------------
+    x <- as.Date("2021-01-05")
+    y <- as.Date("2021-01-04")
+    dat1 <- as_month(x, n = 2L)
+    dat2 <- dat1 - 0:1
+    expect_identical(as.Date(dat2), as.Date(c("2021-01-01", "2020-11-01")))
+    expect_identical(as.integer(dat2 - dat1), c(0L, -1L))
+    expect_error(
+        1 - dat1,
+        "Can only subtract from a <grates_month> object, not vice-versa.",
+        fixed = TRUE
+    )
+    expect_error(
+        -dat1,
+        "Cannot negate a <grates_month> object.",
+        fixed = TRUE
+    )
+    expect_error(
+        dat1 - 1.5,
+        "Can only subtract whole numbers and other <grates_month> objects from <grates_month> objects.",
+        fixed = TRUE
+    )
 
-  expect_snapshot(print(as_month(dates, n = 2)))
-  # This should look like:
-  # <grates_month[24]>
-  #   [1] "2021-Jan to 2021-Feb" "2021-Jan to 2021-Feb" "2021-Mar to 2021-Apr"
-  #   [4] "2021-Mar to 2021-Apr" "2021-May to 2021-Jun" "2021-May to 2021-Jun"
-  #   [7] "2021-Jul to 2021-Aug" "2021-Jul to 2021-Aug" "2021-Sep to 2021-Oct"
-  #  [10] "2021-Sep to 2021-Oct" "2021-Nov to 2021-Dec" "2021-Nov to 2021-Dec"
-  #  [13] "2022-Jan to 2022-Feb" "2022-Jan to 2022-Feb" "2022-Mar to 2022-Apr"
-  #  [16] "2022-Mar to 2022-Apr" "2022-May to 2022-Jun" "2022-May to 2022-Jun"
-  #  [19] "2022-Jul to 2022-Aug" "2022-Jul to 2022-Aug" "2022-Sep to 2022-Oct"
-  #  [22] "2022-Sep to 2022-Oct" "2022-Nov to 2022-Dec" "2022-Nov to 2022-Dec"
+    # Other operations error
+    x <- as_month(as.Date("2021-01-05"), n = 2L)
+    expect_error(dat * 3)
+    expect_error(dat / 3)
+    expect_error(dat ^ 3)
+    expect_error(dat %% 3)
+    expect_error(dat %/% 3)
+    expect_error(dat & 3)
+    expect_error(dat | 3)
+    expect_error(!dat)
+
+    # Math
+    x <- as_month(as.Date("2021-01-05"), n = 2L)
+    dat <- c(x + 0:1, new_month(NA_integer_, n = 2L))
+    expect_identical(is.na(dat), c(FALSE, FALSE, TRUE))
+    expect_identical(is.nan(dat), c(FALSE, FALSE, FALSE))
+    expect_identical(is.finite(dat), c(TRUE, TRUE, FALSE))
+    expect_identical(is.infinite(dat), c(FALSE, FALSE, FALSE))
+    expect_error(abs(dat))
+
 })
 
+test_that("month, miscellaneous work", {
+    expect_identical(new_month(-1.5, n = 2L), new_month(-2L, n = 2L))
+    expect_error(new_month("bob", n = 2L), "`x` must be integer.", fixed = TRUE)
+    expect_error(
+        as_month(NA_character_, n = 2L),
+        "Unable to parse any entries of `x` as Dates.",
+        fixed = TRUE
+    )
+    dat <- Sys.Date()
+    dat <- c(dat, dat - 90L)
+    dat <- as_month(dat, 2L)
+    expect_identical(rep(dat, 2L), c(dat, dat))
+    expect_identical(rep(dat, each = 2L), c(dat[[1]], dat[[1]], dat[[2]], dat[[2]]))
+    expect_identical(unique(c(dat, dat)), dat)
+    dat <- as_month(as.Date("1970-01-01"), n = 3L)
+    expect_identical(
+        seq(dat, dat + 11, by = 2L),
+        new_month(c(0L, 2L, 4L, 6L, 8L, 10L), n = 3L)
+    )
+    expect_error(
+        seq(dat, dat + 11, by = 2.5),
+        "`by` must be an integer of length 1.",
+        fixed = TRUE
+    )
+    expect_error(
+        seq(dat, as.integer(dat + 11), by = 2.5),
+        "`to` must be a <grates_month> object of length 1.",
+        fixed = TRUE
+    )
+    expect_identical(as.integer(new_month(100L, n = 5L)), 100L)
+    expect_identical(as.double(new_month(100L, n = 2L)), 100)
+    expect_identical(min(c(dat, dat+11)), dat)
+    expect_identical(max(c(dat, dat+11)), dat+11)
+    expect_identical(range(seq(dat, dat + 12, by = 2L)), c(dat, dat+12))
+    expect_error(
+        any(dat),
+        "`any()` is not supported for <grates_month> objects.",
+        fixed = TRUE
+    )
 
-test_that("as_month.POSIXlt works as expected", {
-  nz <- as.POSIXlt("2021-01-04", tz = "NZ")
-  result <- as.POSIXlt(as_month(nz), tz = "NZ")
-  expected <- as.POSIXlt("2021-01-01", tz = "NZ")
-  result$gmtoff <- expected$gmtoff <- NULL # HACK but ok for this test
-  result$zone <- expected$zone <- NULL     # HACK but ok for this test
-  attr(result, "tzone") <- "NZ"            # HACK but ok for this test
-  expect_equal(result, expected)
+    expect_error(
+        new_month(1L, n = 1.5),
+        "`n` must be an integer of length 1.",
+        fixed = TRUE
+    )
 
-  dat <- as.POSIXlt("2021-01-04", tz = "UTC")
-  res <- as_month(dat)
+    expect_error(
+        new_month(1L, n = 1:2),
+        "`n` must be an integer of length 1.",
+        fixed = TRUE
+    )
 
-  expect_equal(res, as_month(as.Date("2021-01-01")))
-  expect_equal(as.Date(res), as.Date("2021-01-01"))
+    expect_error(
+        new_month(1L, n = 1L),
+        "`n` must be greater than 1. If single month groupings are required please use `yearmonth()`.",
+        fixed = TRUE
+    )
 
+    expect_error(
+        c(as_month(Sys.Date(), n = 2L), as_month(Sys.Date(), n = 3L)),
+        "Unable to combine <grates_month> objects with different groupings.",
+        fixed = TRUE
+    )
+
+    expect_false(c(as_month(Sys.Date(), n = 2L) == as_month(Sys.Date(), n = 3L)))
+    expect_true(c(as_month(Sys.Date(), n = 2L) != as_month(Sys.Date(), n = 3L)))
+
+    dat1 <- as_month(Sys.Date(), n = 2L)
+    dat2 <- dat1 + 1L
+    expect_identical(dat2 - dat1, 1L)
+
+    expect_error(
+        as_month(Sys.Date(), n = 2L) - as_month(Sys.Date(), n = 3L),
+        "<grates_month> objects must have the same month grouping to perform subtraction.",
+        fixed = TRUE
+    )
 })
-
-
-test_that("as_month.POSIXct works as expected", {
-  nz <- as.POSIXct(as.POSIXlt("2021-01-04", tz = "NZ"), tz = "NZ")
-  result <- as.POSIXct(as_month(nz, 2), tz = "NZ")
-  expect_equal(result, as.POSIXct(as.POSIXlt("2021-01-01", tz = "NZ"), tz = "NZ"))
-  expect_equal(as.Date(result, tz = attr(result, "tzone")), as.Date("2021-01-01"))
-})
-
-
-test_that("as_month.character works as expected", {
-  dat <- "2021-01-04"
-  res <- as_month(dat)
-  expect_equal(as.Date(res), as.Date("2021-01-01"))
-})
-
-
-test_that("as_month.factor works as expected", {
-  dat <- as.factor("2021-01-04")
-  res <- as_month(dat)
-  expect_equal(as.Date(res), as.Date("2021-01-01"))
-})
-
-
-
-
-# as.xxx.grate_month methods -----------------------------------------------------
-
-test_that("as.POSIXct.grate_month works as expected", {
-  dat <- "2021-01-04"
-  res <- as.POSIXct(as_month(dat))
-  expect_equal(res, as.POSIXct(as.POSIXlt("2021-01-01"), tz = ""))
-})
-
-
-test_that("as.POSIXlt.grate_month works as expected", {
-  dat <- "2021-01-04"
-  res <- as.POSIXlt(as_month(dat))
-  expect_s3_class(res, "POSIXlt")
-  expect_equal(julian(res), julian(as.POSIXlt("2021-01-01")))
-})
-
-
-test_that("as.character.grate_month works as expected", {
-  dat <- "2020-12-28"
-  res <- as.character(as_month(dat))
-  expected <- format.Date(as.Date("2020-12-01"), format = "%Y-%b")
-  expect_equal(res, expected)
-})
-
-test_that("as.list.grate_month works as expected", {
-  dat <- as_month(c("2020-12-28", "2021-01-04"))
-  res <- list(as_month("2020-12-28"), as_month("2021-01-04"))
-  expect_equal(res, as.list(dat))
-})
-# -------------------------------------------------------------------------
-
-
-# is_month -----------------------------------------------------------------
-
-test_that("is_month/grate works", {
-  dat <- as_month(Sys.Date())
-  expect_true(is_month(dat))
-  expect_false(is_month("bob"))
-  expect_true(is_grate(dat))
-})
-# -------------------------------------------------------------------------
-
-
-
-# other methods -----------------------------------------------------------
-test_that("subsetting works", {
-  x <- as.Date("2021-01-15")
-  dat <- as_month(x) + 0:1
-  expect_equal(dat[1], as_month(x))
-  expect_equal(dat[[2]], as_month(x + 30))
-
-  dat[1] <- dat[2]
-  expect_equal(dat[1], as_month(x + 30))
-
-  expect_error(dat[1] <- "bob")
-  expect_error(dat[1] <- as_month(x, n = 2))
-})
-
-
-test_that("combine errors correctly", {
-  x <- Sys.Date()
-  dat1 <- as_month(x)
-  dat2 <- as_month(x, n = 2)
-  expect_error(c(dat1, "bob"))
-  expect_error(c(dat1, dat2))
-})
-
-test_that("combine works", {
-  x <- as.Date("2020-05-26")
-  dat <- as_month(x)
-  expect_equal(c(dat, dat), as_month(c(x, x)))
-})
-
-
-# ops ---------------------------------------------------------------------
-test_that("comparison operators work", {
-  x <- Sys.Date()
-  dat1 <- as_month(x)
-
-  expect_true(dat1 == dat1)
-  expect_true(dat1 <= dat1 + 1)
-  expect_true(dat1 >= dat1 - 1)
-  expect_true(dat1 < dat1 + 1)
-  expect_true(dat1 > dat1 - 1)
-  expect_true(dat1 != dat1 + 1)
-})
-
-test_that("addition operation works as expected", {
-  x <- as.Date("2021-01-05")
-  y <- as.Date("2021-01-01")
-  dat1 <- as_month(x)
-  dat2 <- dat1 + 0:1
-
-  expect_equal(as.Date(dat2), c(y, y + 31))
-  expect_equal(dat2, 0:1 + dat1)
-  expect_equal(+dat1, dat1)
-  expect_error(dat1 + 1.5)
-  expect_error(dat1 + dat1)
-})
-
-
-test_that("subtraction operation works as expected", {
-  x <- as.Date("2021-01-05")
-  y <- as.Date("2021-01-01")
-  dat1 <- as_month(x)
-  dat2 <- dat1 - 0:1
-
-
-  expect_equal(as.Date(dat2), c(y, y - 31))
-  expect_equal(dat2-dat1, c(0,-1))
-
-
-  expect_error(1 - dat1)
-  expect_error(-dat1)
-  expect_error(dat1 - 1.5)
-  expect_error(dat1 + dat1)
-})
-
-
-test_that("Other operations error", {
-  x <- as_month(as.Date("2021-01-05"))
-
-  expect_error(dat * 3)
-  expect_error(dat / 3)
-  expect_error(dat ^ 3)
-  expect_error(dat %% 3)
-  expect_error(dat %/% 3)
-  expect_error(dat & 3)
-  expect_error(dat | 3)
-  expect_error(!dat)
-})
-
-
-test_that("Maths works", {
-  x <- as_month(as.Date("2021-01-05"))
-  dat <- c(x + 0:1, NA)
-  expect_equal(is.nan(dat), c(FALSE, FALSE, FALSE))
-  expect_equal(is.finite(dat), c(TRUE, TRUE, FALSE))
-  expect_equal(is.infinite(dat), c(FALSE, FALSE, FALSE))
-  expect_error(abs(dat))
-})
-
-
 
