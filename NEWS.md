@@ -1,3 +1,8 @@
+# grates 1.0.1
+
+* Fix erroneous tests flagged by CRAN.
+* No user facing changes.
+
 # grates 1.0.0
 
 For the first major release of grates a significant refactor has been undertaken

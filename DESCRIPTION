@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     c(
       person(
@@ -24,8 +24,8 @@ Suggests: knitr, ggplot2, scales, vctrs, rlang, rmarkdown, outbreaks,
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-03-17 13:34:48 UTC; tim
+Packaged: 2023-03-30 08:59:33 UTC; tim
 Author: Tim Taylor [aut, cre] (<https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2023-03-17 14:00:08 UTC
+Date/Publication: 2023-04-02 22:30:15 UTC
