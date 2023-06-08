@@ -37,6 +37,9 @@ test_that("yearweek plotting works", {
             ggplot2::theme_bw() +
             ggplot2::xlab("")
 
+    yearweek_monday_breaks <- yearweek_monday +
+        scale_x_grates_yearweek(breaks = yearweek(2015, c(3, 13), 1), firstday = 1)
+
     yearweek_thursday <-
         dat |>
         dplyr::mutate(date = as_yearweek(date_of_infection, firstday = 4L)) |>
@@ -47,8 +50,13 @@ test_that("yearweek plotting works", {
         ggplot2::theme_bw() +
         ggplot2::xlab("")
 
+    yearweek_thursday_breaks <- yearweek_thursday +
+        scale_x_grates_yearweek_thursday(breaks = yearweek(2014, c(25,35,45), 4))
+
     expect_snapshot_plot("yearweek_monday", yearweek_monday)
+    expect_snapshot_plot("yearweek_monday_breaks", yearweek_monday_breaks)
     expect_snapshot_plot("yearweek_thursday", yearweek_thursday)
+    expect_snapshot_plot("yearweek_thursday_breaks", yearweek_thursday_breaks)
 })
 
 
@@ -68,8 +76,20 @@ test_that("isoweek plotting works", {
             ggplot2::theme_bw() +
             ggplot2::xlab("")
 
+    isoweek_breaks <- isoweek +
+        scale_x_grates_isoweek(breaks = isoweek(year = 2014, week = c(35, 45)))
+
+    isoweek_breaks_dates <- isoweek +
+        scale_x_grates_isoweek(
+            breaks = isoweek(year = 2014:2015, week = c(35, 3)),
+            format = "%Y-%m-%d"
+        ) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
+
 
     expect_snapshot_plot("isoweek", isoweek)
+    expect_snapshot_plot("isoweek_breaks", isoweek_breaks)
+    expect_snapshot_plot("isoweek_breaks_dates", isoweek_breaks_dates)
 })
 
 
@@ -89,8 +109,20 @@ test_that("epiweek plotting works", {
         ggplot2::theme_bw() +
         ggplot2::xlab("")
 
+    epiweek_breaks <- epiweek +
+        scale_x_grates_epiweek(breaks = epiweek(year = 2014, week = c(35, 45)))
+
+    epiweek_breaks_dates <- epiweek +
+        scale_x_grates_epiweek(
+            breaks = epiweek(year = 2014:2015, week = c(35, 3)),
+            format = "%Y-%m-%d"
+        ) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
+
 
     expect_snapshot_plot("epiweek", epiweek)
+    expect_snapshot_plot("epiweek_breaks", epiweek_breaks)
+    expect_snapshot_plot("epiweek_breaks_dates", epiweek_breaks_dates)
 })
 
 test_that("yearmonth plotting works", {
@@ -113,15 +145,15 @@ test_that("yearmonth plotting works", {
             ggplot2::theme_bw() +
             ggplot2::xlab("")
 
-    month2 <-
-        month_dat |>
-            ggplot2::ggplot(ggplot2::aes(date, cases)) +
-            ggplot2::geom_col(width = 1, colour = "white") +
-            ggplot2::theme_bw() +
-            ggplot2::xlab("") +
-            scale_x_grates_yearmonth(n.breaks = 4, format = "%Y-%m-%d")
+    month_breaks <- month +
+        scale_x_grates_yearmonth(breaks = yearmonth(year = 2014, month = 3:12)) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
+
+    month2 <- month +
+        scale_x_grates_yearmonth(n.breaks = 4, format = "%Y-%m-%d")
 
     expect_snapshot_plot("yearmonth", month)
+    expect_snapshot_plot("yearmonth_breaks", month_breaks)
     expect_snapshot_plot("yearmonth2", month2)
 })
 
@@ -144,6 +176,9 @@ test_that("yearquarter plotting works", {
             ggplot2::theme_bw() +
             ggplot2::xlab("")
 
+    quarter_breaks <- quarter +
+        scale_x_grates_yearquarter(breaks = yearquarter(2014, 1) + 0:4)
+
     quarter2 <-
         ggplot2::ggplot(quarter_dat, ggplot2::aes(date, cases)) +
         ggplot2::geom_col(width = 1, colour = "white") +
@@ -151,8 +186,13 @@ test_that("yearquarter plotting works", {
         ggplot2::theme_bw() +
         ggplot2::xlab("")
 
+    quarter2_breaks <- quarter2 +
+        scale_x_grates_yearquarter(breaks = yearquarter(2014, 1) + 0:5, format = "%Y-%m-%d")
+
     expect_snapshot_plot("yearquarter", quarter)
+    expect_snapshot_plot("yearquarter_breaks", quarter_breaks)
     expect_snapshot_plot("yearquarter2", quarter2)
+    expect_snapshot_plot("yearquarter2_breaks", quarter2_breaks)
 })
 
 
@@ -175,6 +215,9 @@ test_that("year plotting works", {
         ggplot2::theme_bw() +
         ggplot2::xlab("")
 
+    year_breaks <- year +
+        scale_x_grates_year(breaks = year(2014))
+
     year2 <-
         ggplot2::ggplot(year_dat, ggplot2::aes(date, cases)) +
         ggplot2::geom_col(width = 1, colour = "white") +
@@ -182,8 +225,13 @@ test_that("year plotting works", {
         ggplot2::theme_bw() +
         ggplot2::xlab("")
 
+    year2_breaks <- year +
+        scale_x_grates_year(breaks = year(2014:2016), format = "%Y-%m-%d")
+
     expect_snapshot_plot("year", year)
+    expect_snapshot_plot("year_breaks", year_breaks)
     expect_snapshot_plot("year2", year2)
+    expect_snapshot_plot("year2_breaks", year2_breaks)
 })
 
 test_that("month plotting works", {
@@ -206,6 +254,10 @@ test_that("month plotting works", {
         ggplot2::theme_bw() +
         ggplot2::xlab("")
 
+    month_breaks <- month +
+        scale_x_grates_month(breaks = as_month("2014-05-01", n = 2) + 0:5 , n = 2) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
+
     month2 <-
         month_dat |>
         ggplot2::ggplot(ggplot2::aes(date, cases)) +
@@ -217,6 +269,7 @@ test_that("month plotting works", {
 
 
     expect_snapshot_plot("month", month)
+    expect_snapshot_plot("month_breaks", month_breaks)
     expect_snapshot_plot("month2", month2)
 })
 
@@ -236,7 +289,12 @@ test_that("period plotting works", {
             ggplot2::theme_bw() +
             ggplot2::xlab("")
 
+    br <- as_period(c("2014-08-28", "2015-01-15"), n = 14)
+    two_weeks_breaks <- two_weeks +
+        scale_x_grates_period(breaks = br, n = 14, offset = 0)
+
     expect_snapshot_plot("two_weeks", two_weeks)
+    expect_snapshot_plot("two_weeks_breaks", two_weeks_breaks)
 
     twentyeight_days <-
         dat |>
@@ -250,7 +308,13 @@ test_that("period plotting works", {
             scale_x_grates_period(n.breaks = 7L, n = 28, offset = 0L) +
             ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
 
+    br <- as_period("2014-06-19", n = 28) + c(0,2,4)
+    twentyeight_days_breaks <- twentyeight_days +
+        scale_x_grates_period(breaks = br, n=28, offset = 0) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 45))
+
     expect_snapshot_plot("twentyeight_days", twentyeight_days)
+    expect_snapshot_plot("twentyeight_days_breaks", twentyeight_days_breaks)
 
 
 })

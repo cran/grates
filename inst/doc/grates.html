@@ -430,14 +430,14 @@ are stored as the integer number of weeks since 1969-12-29.</p>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># epiweeks always start on a Sunday</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>(epiwk <span class="ot">&lt;-</span> <span class="fu">as_epiweek</span>(<span class="fu">Sys.Date</span>()))</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[1]&gt;</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2023-W13&quot;</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2023-W23&quot;</span></span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu">weekdays</span>(<span class="fu">as.Date</span>(epiwk))</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Sunday&quot;</span></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># isoweeks always start on a Sunday</span></span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>(isowk <span class="ot">&lt;-</span> <span class="fu">as_isoweek</span>(<span class="fu">Sys.Date</span>()))</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_isoweek[1]&gt;</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2023-W13&quot;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2023-W23&quot;</span></span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="fu">weekdays</span>(<span class="fu">as.Date</span>(isowk))</span>
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Monday&quot;</span></span></code></pre></div>
 <p>By default plots (using {ggplot2}) will centre yearweek (epiweek /
@@ -689,67 +689,69 @@ objects, below we illustrate how it manifests with epiweek objects.</p>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>(maxx <span class="ot">&lt;-</span> <span class="fu">max</span>(x))</span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[1]&gt;</span></span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2015-W17&quot;</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>rangex <span class="ot">&lt;-</span> <span class="fu">range</span>(x)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># seq method works if both `from` and `to` are epiweeks</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="at">from =</span> minx, <span class="at">to =</span> maxx, <span class="at">by =</span> 6L)</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[10]&gt;</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;2014-W12&quot; &quot;2014-W18&quot; &quot;2014-W24&quot; &quot;2014-W30&quot; &quot;2014-W36&quot; &quot;2014-W42&quot;</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;2014-W48&quot; &quot;2015-W01&quot; &quot;2015-W07&quot; &quot;2015-W13&quot;</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co"># but will error informatively if `to` is a different class</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">seq</span>(<span class="at">from =</span> minx, <span class="at">to =</span> <span class="dv">999</span>, <span class="at">by =</span> 6L))</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in seq.grates_epiweek(from = minx, to = 999, by = 6L) : </span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   `to` must be a &lt;grates_epiweek&gt; object of length 1.</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co"># conversion of yearweek objects back to dates will return the date at the</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co"># lower bound of each yearweek interval</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">head</span>(week_dat)</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="fu">transform</span>(dat, <span class="at">new_date =</span> <span class="fu">as.Date</span>(week))</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       week cases   new_date</span></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2014-W12     1 2014-03-16</span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2014-W15     1 2014-04-06</span></span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2014-W16     1 2014-04-13</span></span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2014-W17     3 2014-04-20</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2014-W18     6 2014-04-27</span></span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2014-W19    16 2014-05-04</span></span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="co"># addition (subtraction) of wholenumbers will add (subtract) the corresponding</span></span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="co"># number of weeks to (from) the object</span></span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>(dat <span class="ot">&lt;-</span> <span class="fu">transform</span>(dat, <span class="at">plus4 =</span> week <span class="sc">+</span> 4L, <span class="at">minus4 =</span> week <span class="sc">-</span> 4L))</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       week cases    plus4   minus4</span></span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2014-W12     1 2014-W16 2014-W08</span></span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2014-W15     1 2014-W19 2014-W11</span></span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2014-W16     1 2014-W20 2014-W12</span></span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2014-W17     3 2014-W21 2014-W13</span></span>
-<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2014-W18     6 2014-W22 2014-W14</span></span>
-<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2014-W19    16 2014-W23 2014-W15</span></span>
-<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="co"># addition of two yearweek objects will error as the intention is unclear</span></span>
-<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">transform</span>(dat, <span class="at">willerror =</span> week <span class="sc">+</span> week))</span>
-<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in Ops.grates_epiweek(week, week) : </span></span>
-<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Cannot add &lt;grates_epiweek&gt; objects to each other.</span></span>
-<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Subtraction of two yearweek objects gives the difference in weeks between them</span></span>
-<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a><span class="fu">transform</span>(dat, <span class="at">difference =</span> plus4 <span class="sc">-</span> minus4)</span>
-<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       week cases    plus4   minus4 difference</span></span>
-<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2014-W12     1 2014-W16 2014-W08    8 weeks</span></span>
-<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2014-W15     1 2014-W19 2014-W11    8 weeks</span></span>
-<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2014-W16     1 2014-W20 2014-W12    8 weeks</span></span>
-<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2014-W17     3 2014-W21 2014-W13    8 weeks</span></span>
-<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2014-W18     6 2014-W22 2014-W14    8 weeks</span></span>
-<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2014-W19    16 2014-W23 2014-W15    8 weeks</span></span>
-<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="co"># epiweeks can be combined with themselves but not other classes (assuming an</span></span>
-<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a><span class="co"># epiweek object is the first entry)</span></span>
-<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(minx, maxx)</span>
-<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[2]&gt;</span></span>
-<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2014-W12&quot; &quot;2015-W17&quot;</span></span>
-<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">c</span>(minx, maxx), rangex)</span>
-<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">c</span>(minx, 1L))</span>
-<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in c.grates_epiweek(minx, 1L) : </span></span>
-<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Unable to combine &lt;grates_epiweek&gt; objects with other classes.</span></span></code></pre></div>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>(rangex <span class="ot">&lt;-</span> <span class="fu">range</span>(x))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[2]&gt;</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2014-W12&quot; &quot;2015-W17&quot;</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co"># seq method works if both `from` and `to` are epiweeks</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="at">from =</span> minx, <span class="at">to =</span> maxx, <span class="at">by =</span> 6L)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[10]&gt;</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;2014-W12&quot; &quot;2014-W18&quot; &quot;2014-W24&quot; &quot;2014-W30&quot; &quot;2014-W36&quot; &quot;2014-W42&quot;</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;2014-W48&quot; &quot;2015-W01&quot; &quot;2015-W07&quot; &quot;2015-W13&quot;</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co"># but will error informatively if `to` is a different class</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">seq</span>(<span class="at">from =</span> minx, <span class="at">to =</span> <span class="dv">999</span>, <span class="at">by =</span> 6L))</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in seq.grates_epiweek(from = minx, to = 999, by = 6L) : </span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   `to` must be a &lt;grates_epiweek&gt; object of length 1.</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co"># conversion of yearweek objects back to dates will return the date at the</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="co"># lower bound of each yearweek interval</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">head</span>(week_dat)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="fu">transform</span>(dat, <span class="at">new_date =</span> <span class="fu">as.Date</span>(week))</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       week cases   new_date</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2014-W12     1 2014-03-16</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2014-W15     1 2014-04-06</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2014-W16     1 2014-04-13</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2014-W17     3 2014-04-20</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2014-W18     6 2014-04-27</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2014-W19    16 2014-05-04</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="co"># addition (subtraction) of wholenumbers will add (subtract) the corresponding</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="co"># number of weeks to (from) the object</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>(dat <span class="ot">&lt;-</span> <span class="fu">transform</span>(dat, <span class="at">plus4 =</span> week <span class="sc">+</span> 4L, <span class="at">minus4 =</span> week <span class="sc">-</span> 4L))</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       week cases    plus4   minus4</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2014-W12     1 2014-W16 2014-W08</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2014-W15     1 2014-W19 2014-W11</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2014-W16     1 2014-W20 2014-W12</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2014-W17     3 2014-W21 2014-W13</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2014-W18     6 2014-W22 2014-W14</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2014-W19    16 2014-W23 2014-W15</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="co"># addition of two yearweek objects will error as the intention is unclear</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">transform</span>(dat, <span class="at">willerror =</span> week <span class="sc">+</span> week))</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in Ops.grates_epiweek(week, week) : </span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Cannot add &lt;grates_epiweek&gt; objects to each other.</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Subtraction of two yearweek objects gives the difference in weeks between them</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="fu">transform</span>(dat, <span class="at">difference =</span> plus4 <span class="sc">-</span> minus4)</span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       week cases    plus4   minus4 difference</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 2014-W12     1 2014-W16 2014-W08    8 weeks</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2014-W15     1 2014-W19 2014-W11    8 weeks</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 2014-W16     1 2014-W20 2014-W12    8 weeks</span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 2014-W17     3 2014-W21 2014-W13    8 weeks</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 2014-W18     6 2014-W22 2014-W14    8 weeks</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 2014-W19    16 2014-W23 2014-W15    8 weeks</span></span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="co"># epiweeks can be combined with themselves but not other classes (assuming an</span></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="co"># epiweek object is the first entry)</span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(minx, maxx)</span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;grates_epiweek[2]&gt;</span></span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;2014-W12&quot; &quot;2015-W17&quot;</span></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">c</span>(minx, maxx), rangex)</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">c</span>(minx, 1L))</span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in c.grates_epiweek(minx, 1L) : </span></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Unable to combine &lt;grates_epiweek&gt; objects with other classes.</span></span></code></pre></div>
 </div>
 
 
