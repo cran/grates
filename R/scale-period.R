@@ -88,15 +88,31 @@ scale_x_grates_period <- function(..., breaks = ggplot2::waiver(), n.breaks = 6L
     grates_period_env$n <- NULL
     grates_period_env$offset <- NULL
 
-    ggplot2::scale_x_continuous(
-        trans = .grates_period_trans(
-            breaks = breaks,
-            n.breaks = n.breaks,
-            n = n,
-            offset = offset,
-            format = format
+    # ggplot2 3.5.0 deprecated the `trans` argument in favour of `transform`.
+    # We could just force a minimum ggplot2 version and avoid this branching
+    # but it's relatively low effort so leaving for now.
+    # TODO - revisit.
+    if (utils::packageVersion("ggplot2") < '3.5.0') {
+        ggplot2::scale_x_continuous(
+            trans = .grates_period_trans(
+                breaks = breaks,
+                n.breaks = n.breaks,
+                n = n,
+                offset = offset,
+                format = format
+            )
         )
-    )
+    } else {
+        ggplot2::scale_x_continuous(
+            transform = .grates_period_trans(
+                breaks = breaks,
+                n.breaks = n.breaks,
+                n = n,
+                offset = offset,
+                format = format
+            )
+        )
+    }
 }
 
 # -------------------------------------------------------------------------
@@ -127,7 +143,7 @@ scale_type.grates_period <- function(x) {
 
     # breaks function
     brks <- function(x) {
-        if (!inherits(breaks,"waiver")) {
+        if (!inherits(breaks, "waiver")) {
             dat <- as.numeric(breaks)
         } else {
             dat <- scales::breaks_pretty(n.breaks)(as.numeric(x))

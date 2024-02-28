@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -147,7 +147,7 @@ year(2022L)
     xlab(""))
 
 ## -----------------------------------------------------------------------------
-month_plot + scale_x_grates_yearmonth(format = NULL)
+bimonth_plot + scale_x_grates_month(format = NULL, n = 2L)
 
 ## -----------------------------------------------------------------------------
 # use the unique epiweeks from the earlier example
