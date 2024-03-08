@@ -150,38 +150,45 @@ year(2022L)
 bimonth_plot + scale_x_grates_month(format = NULL, n = 2L)
 
 ## -----------------------------------------------------------------------------
-# use the unique epiweeks from the earlier example
-x <- week_dat$week
+weeks <- week_dat$week
 
+## -----------------------------------------------------------------------------
+dat <- weeks[1:5]
+data.frame(
+    week = dat,
+    start = date_start(dat),
+    end = date_end(dat),
+    contains.2014.04.14 = as.Date("2014-04-14") %during% dat
+)
+
+## -----------------------------------------------------------------------------
+identical(as.Date(weeks), date_start(weeks))
+
+## -----------------------------------------------------------------------------
 # min, max and range
-(minx <- min(x))
-(maxx <- max(x))
-(rangex <- range(x))
+(minw <- min(weeks))
+(maxw <- max(weeks))
+(rangew <- range(weeks))
 
 # seq method works if both `from` and `to` are epiweeks
-seq(from = minx, to = maxx, by = 6L)
+seq(from = minw, to = maxw, by = 6L)
 
 # but will error informatively if `to` is a different class
-try(seq(from = minx, to = 999, by = 6L))
+try(seq(from = minw, to = 999, by = 6L))
 
-# conversion of yearweek objects back to dates will return the date at the
-# lower bound of each yearweek interval
+## -----------------------------------------------------------------------------
 dat <- head(week_dat)
-transform(dat, new_date = as.Date(week))
-
-# addition (subtraction) of wholenumbers will add (subtract) the corresponding
-# number of weeks to (from) the object
 (dat <- transform(dat, plus4 = week + 4L, minus4 = week - 4L))
 
-# addition of two yearweek objects will error as the intention is unclear
+## -----------------------------------------------------------------------------
 try(transform(dat, willerror = week + week))
 
-# Subtraction of two yearweek objects gives the difference in weeks between them
+## -----------------------------------------------------------------------------
 transform(dat, difference = plus4 - minus4)
 
-# epiweeks can be combined with themselves but not other classes (assuming an
-# epiweek object is the first entry)
-c(minx, maxx)
-identical(c(minx, maxx), rangex)
-try(c(minx, 1L))
+## -----------------------------------------------------------------------------
+c(minw, maxw)
+identical(c(minw, maxw), rangew)
+
+try(c(minw, 1L))
 

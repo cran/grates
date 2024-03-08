@@ -459,3 +459,31 @@ test_that("yearweek, miscellaneous work", {
     expect_error(yearweek(firstday=8L), "`firstday` must be an integer between 1 (Monday) and 7 (Sunday).", fixed = TRUE)
     expect_identical(yearweek(firstday = 1.0), yearweek(firstday = 1L))
 })
+
+test_that("yearweek boundary functions work", {
+    # taking a long-winded manual approach to this double test various things
+    # 2020-01-01 is a wednesday
+    dates <- as.Date("2020-01-01") + 0:14
+    weeks <- as_yearweek(dates, firstday = 4L) # thursday
+    starts <- as.Date("2019-12-26") + integer(15L)
+    starts[2:8] <- starts[2:8] + 7L
+    starts[9:15] <- starts[9:15] + 14L
+    ends <- starts + 7 - 1L
+    expect_identical(date_start(weeks), starts)
+    expect_identical(date_end(weeks), ends)
+
+    d1 <- as.Date("2019-12-31")
+    expected <- logical(15L)
+    expected[1L] <- TRUE
+    expect_identical(d1 %during% weeks, expected)
+
+    d2 <- as.Date("2020-01-02")
+    expected <- logical(15L)
+    expected[2:8] <- TRUE
+    expect_identical(d2 %during% weeks, expected)
+
+    d3 <- as.Date("2020-01-15")
+    expected <- logical(15L)
+    expected[9:15] <- TRUE
+    expect_identical(d3 %during% weeks, expected)
+})
