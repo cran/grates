@@ -159,6 +159,7 @@ scale_x_grates_yearweek_epiweek <- function(..., breaks = ggplot2::waiver(), n.b
 # scale_type.  It will then dispatch based on the output of this function to
 # one of scale_x_yearweek_xxx defined below.
 # registered in .onLoad() (see zzz.R)
+#' @exportS3Method ggplot2::scale_type
 scale_type.grates_yearweek <- function(x) {
 
     # -------------------------------------------------------------------------
@@ -198,12 +199,12 @@ scale_type.grates_yearweek <- function(x) {
 
     # breaks function
     brks <- function(x) {
-        if (!inherits(breaks, "waiver")) {
-            dat <- as.numeric(breaks)
-        } else {
+        if (inherits(breaks, "waiver")) {
             dat <- scales::breaks_pretty(n.breaks)(as.numeric(x))
             dat <- as.integer(floor(dat))
             dat <- as.numeric(new_yearweek(dat, firstday = firstday))
+        } else {
+            dat <- as.numeric(breaks)
         }
         dat - shift
     }

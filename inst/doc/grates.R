@@ -1,10 +1,10 @@
 ## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.align = "center",
-  fig.width = 7,
-  fig.height = 5
+    collapse = TRUE,
+    comment = "#>",
+    fig.align = "center",
+    fig.width = 7,
+    fig.height = 5
 )
 
 ## -----------------------------------------------------------------------------
@@ -20,7 +20,7 @@ weeks <- as_yearweek(dates, firstday = 5L)
 (dat <- data.frame(dates, weeks))
 
 # we can also use the constructor function if we already have weeks and years
-yearweek(year =c(2020L, 2021L), week = c(1L, 10L), firstday = 5L)
+yearweek(year = c(2020L, 2021L), week = c(1L, 10L), firstday = 5L)
 
 # epiweeks always start on a Sunday
 (epiwk <- as_epiweek(Sys.Date()))
@@ -48,7 +48,7 @@ head(week_dat)
 
 # plot the output
 (week_plot <-
-    ggplot(week_dat, aes(week, cases)) + 
+    ggplot(week_dat, aes(week, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw())
 
@@ -70,8 +70,8 @@ head(period_dat)
 # lower date bounds are used for the x axis
 ggplot(period_dat, aes(period, cases)) +
     geom_col(width = 1, colour = "white") +
-    theme_bw( ) +
-    theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
 # using a date as an offset
@@ -89,11 +89,11 @@ data.frame(dates, period = as_period(dates, n = 7L, offset = offset))
 ))
 
 # plot with centred labels
-(month_plot <- 
-    ggplot(month_dat, aes(month, cases)) + 
+(month_plot <-
+    ggplot(month_dat, aes(month, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab(""))
 
 # again we can have non-centred date labels by applying the associated scale
@@ -106,10 +106,10 @@ month_plot + scale_x_grates_yearmonth(format = "%Y-%m-%d")
     FUN = length
 ))
 
-ggplot(quarter_dat, aes(quarter, cases)) + 
+ggplot(quarter_dat, aes(quarter, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
 # year also works similarly
@@ -119,10 +119,10 @@ ggplot(quarter_dat, aes(quarter, cases)) +
     length
 ))
 
-ggplot(year_dat, aes(year, cases)) + 
+ggplot(year_dat, aes(year, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
 # Construction functions can also be used
@@ -139,11 +139,11 @@ year(2022L)
 ))
 
 # by default lower date bounds are used for the x axis
-(bimonth_plot <- 
-    ggplot(bimonth_dat, aes(group, cases)) + 
+(bimonth_plot <-
+    ggplot(bimonth_dat, aes(group, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab(""))
 
 ## -----------------------------------------------------------------------------

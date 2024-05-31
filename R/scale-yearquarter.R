@@ -63,6 +63,7 @@ scale_x_grates_yearquarter <- function(..., breaks = ggplot2::waiver(), n.breaks
 
 
 # -------------------------------------------------------------------------
+#' @exportS3Method ggplot2::scale_type
 scale_type.grates_yearquarter <- function(x) {
 
     # -------------------------------------------------------------------------
@@ -90,12 +91,12 @@ scale_type.grates_yearquarter <- function(x) {
 
     # breaks function
     brks <- function(x) {
-        if (!inherits(breaks, "waiver")) {
-            dat <- as.numeric(breaks)
-        } else {
+        if (inherits(breaks, "waiver")) {
             dat <- scales::breaks_pretty(n.breaks)(as.numeric(x))
             dat <- as.integer(floor(dat))
             dat <- as.numeric(new_yearquarter(dat))
+        } else {
+            dat <- as.numeric(breaks)
         }
         dat - shift
     }

@@ -128,6 +128,11 @@ new_yearweek <- function(x = integer(), firstday = 1L) {
 #' @export
 yearweek <- function(year = integer(), week = integer(), firstday = 1L) {
 
+    # TODO - Work out why we are forcing the input to not have any additional
+    #        attributes (implied by the is.vector usage) and consider mentioning
+    #        in the error message. Need to document this when I remember
+    #        reasoning.
+
     # check year is integerish
     if (is.vector(year, "double")) {
         year <- as.integer(floor(year))
@@ -195,14 +200,31 @@ print.grates_yearweek <- function(x, ...) {
 }
 
 # -------------------------------------------------------------------------
+#' @exportS3Method vctrs::vec_ptype_abbr
 vec_ptype_abbr.grates_yearweek <- function(x, ...) {"yrwk"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek <- function(x, ...) {"yearweek"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_monday <- function(x, ...) {"yearweek-mon"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_tuesday <- function(x, ...) {"yearweek-tue"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_wednesday <- function(x, ...) {"yearweek-wed"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_thursday <- function(x, ...) {"yearweek-thu"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_friday <- function(x, ...) {"yearweek-fri"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_saturday <- function(x, ...) {"yearweek-sat"}
+
+#' @exportS3Method vctrs::vec_ptype_full
 vec_ptype_full.grates_yearweek_sunday <- function(x, ...) {"yearweek-sun"}
 
 # -------------------------------------------------------------------------
@@ -671,7 +693,7 @@ Ops.grates_yearweek <- function(e1, e2) {
 .yearweek <- function(year, week, firstday) {
     na_values <- is.na(year) | is.na(week)
     invalid <- !logical(length(na_values))
-    if (any(!na_values))
+    if(!all(na_values))
         invalid[!na_values] <- week[!na_values] > .last_week_in_year(year = year[!na_values], firstday = firstday)
     if (any(invalid))
         warning("Some entries invalid for given `year` and `week` values. Returning these as NA.", call. = FALSE)

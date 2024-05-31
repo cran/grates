@@ -1,3 +1,7 @@
+# grates 1.2.1
+
+* Package now depends on R (>= 3.6.0).
+
 # grates 1.2.0
 
 * New functions `date_start()` and `date_end()` for accessing the

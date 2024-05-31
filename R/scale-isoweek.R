@@ -63,6 +63,7 @@ scale_x_grates_isoweek <- function(..., breaks = ggplot2::waiver(), n.breaks = 6
 }
 
 # -------------------------------------------------------------------------
+#' @exportS3Method ggplot2::scale_type
 scale_type.grates_isoweek <- function(x) {
 
     # -------------------------------------------------------------------------
@@ -88,12 +89,12 @@ scale_type.grates_isoweek <- function(x) {
 
     # breaks function
     brks <- function(x) {
-        if (!inherits(breaks, "waiver")) {
-            dat <- as.numeric(breaks)
-        } else {
+        if (inherits(breaks, "waiver")) {
             dat <- scales::breaks_pretty(n.breaks)(as.numeric(x))
             dat <- as.integer(floor(dat))
             dat <- as.numeric(new_isoweek(dat))
+        } else {
+            dat <- as.numeric(breaks)
         }
         dat - shift
     }
