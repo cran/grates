@@ -24,10 +24,12 @@ yearweek(year = c(2020L, 2021L), week = c(1L, 10L), firstday = 5L)
 
 # epiweeks always start on a Sunday
 (epiwk <- as_epiweek(Sys.Date()))
+
 weekdays(as.Date(epiwk))
 
 # isoweeks always start on a Sunday
 (isowk <- as_isoweek(Sys.Date()))
+
 weekdays(as.Date(isowk))
 
 ## -----------------------------------------------------------------------------
@@ -67,28 +69,24 @@ period_dat <- aggregate(
 
 head(period_dat)
 
-# lower date bounds are used for the x axis
 ggplot(period_dat, aes(period, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
-# using a date as an offset
-start <- as.Date("2020-01-03")
-dates <- start + 0:9
+## -----------------------------------------------------------------------------
+dates <- as.Date("2020-01-03") + 0:9
 offset <- as.Date("2020-01-01")
 data.frame(dates, period = as_period(dates, n = 7L, offset = offset))
 
 ## -----------------------------------------------------------------------------
-# calculate the monthly number of cases
 (month_dat <- aggregate(
     list(cases = dat),
     by = list(month = as_yearmonth(dat)),
     FUN = length
 ))
 
-# plot with centred labels
 (month_plot <-
     ggplot(month_dat, aes(month, cases)) +
     geom_col(width = 1, colour = "white") +
@@ -96,10 +94,10 @@ data.frame(dates, period = as_period(dates, n = 7L, offset = offset))
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab(""))
 
-# again we can have non-centred date labels by applying the associated scale
+## -----------------------------------------------------------------------------
 month_plot + scale_x_grates_yearmonth(format = "%Y-%m-%d")
 
-# yearquarter works similarly
+## -----------------------------------------------------------------------------
 (quarter_dat <- aggregate(
     list(cases = dat),
     by = list(quarter = as_yearquarter(dat)),
@@ -112,7 +110,7 @@ ggplot(quarter_dat, aes(quarter, cases)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
-# year also works similarly
+## -----------------------------------------------------------------------------
 (year_dat <- aggregate(
     list(cases = dat),
     by = list(year = as_year(dat)),
@@ -125,6 +123,7 @@ ggplot(year_dat, aes(year, cases)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
+## -----------------------------------------------------------------------------
 # Construction functions can also be used
 yearmonth(2022L, 11L)
 yearquarter(2022L, 4L)

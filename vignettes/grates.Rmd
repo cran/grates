@@ -6,6 +6,7 @@ vignette: >
   %\VignetteIndexEntry{Introduction}
   %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{outbreaks, ggplot2}
 ---
 
 ```{r, include = FALSE}
@@ -20,12 +21,12 @@ knitr::opts_chunk$set(
 
 # Overview
 
-The goal of {grates} is to make it easy to group dates across a range of different
+The goal of grates is to make it easy to group dates across a range of different
 time intervals. It defines a collection of classes and associated methods that,
 together, formalise the concept of grouped dates and are intuitive to use. To
 assist in formatting plots of grates objects we also provides x-axis scales that
 can be used in conjunction with
-[{ggplot2}](https://cran.r-project.org/package=ggplot2) output. Currently
+[ggplot2](https://cran.r-project.org/package=ggplot2) output. Currently
 implemented classes are:
 
 - [grates_yearweek](#yearweek);
@@ -41,17 +42,19 @@ implemented classes are:
 - [grates_month](#month)
 
 The underlying implementation for these objects build upon ideas of Davis
-Vaughan and the unreleased [{datea}](https://github.com/DavisVaughan/datea/)
+Vaughan and the unreleased [datea](https://github.com/DavisVaughan/datea/)
 package as well as Zhian Kamvar and the
-[{aweek}](https://cran.r-project.org/package=aweek) package.
+[aweek](https://cran.r-project.org/package=aweek) package.
+
+Note that for brevity in the rest of the vignette, we will drop the `grates_`
+prefix when discussing the underlying class.
 
 
 # grates objects
 
-
 ## yearweek, epiweek and isoweek {#yearweek}
 
-**yearweek** objects are stored as the number of weeks (starting at 0L) from
+yearweek objects are stored as the number of weeks (starting at 0L) from
 the date of the `firstday` nearest the Unix Epoch (1970-01-01). Put more simply,
 the number of seven day periods from:
 
@@ -71,13 +74,13 @@ and `firstday`, the day of the week you wish your weeks to start on. `yearweek()
 takes three arguments; `year` and `week` integer vectors and, again, a
 `firstday` value.
 
-The **epiweek** class is similar to the yearweek class but, by definition, will
+The epiweek class is similar to the yearweek class but, by definition, will
 always begin on a Sunday. They are stored as the integer number of weeks (again
 starting at 0L) since 1970-01-04 so internally are akin to
-`<grates_yearweek_sunday>` objects but with the benefit of slightly more
+`grates_yearweek_sunday` objects but with the benefit of slightly more
 efficient implementations for many of the associated methods. 
 
-Likewise, the **isoweek** class is similar to epiweek class but uses the
+Likewise, the isoweek class is similar to epiweek class but uses the
 [ISO 8601](https://en.wikipedia.org/wiki/ISO_week_date) definition of a week
 that will always start on a Monday. Internally they are stored as the integer
 number of weeks since 1969-12-29.
@@ -99,17 +102,25 @@ yearweek(year = c(2020L, 2021L), week = c(1L, 10L), firstday = 5L)
 
 # epiweeks always start on a Sunday
 (epiwk <- as_epiweek(Sys.Date()))
+
 weekdays(as.Date(epiwk))
 
 # isoweeks always start on a Sunday
 (isowk <- as_isoweek(Sys.Date()))
+
 weekdays(as.Date(isowk))
 ```
 
-By default plots (using {ggplot2}) will centre yearweek (epiweek / isoweek)
+By default plots (using ggplot2) will centre yearweek (epiweek / isoweek)
 labels:
 
 ```{r}
+#| fig.alt: >
+#|   Bar chart of epiweekly incidence (by week of infection) covering 2014-W12
+#|   to 2015-W17 inclusive. The graph peaks at 2014-W38. The "descent" from the
+#|   peak tapers off slower than the initial "ascent". Six labels of the form
+#|   'year-week' are evenly spread along the x-axis and centred on the
+#|   corresponding bars.
 library(ggplot2)
 
 # use simulated linelist data from the outbreaks package
@@ -137,17 +148,23 @@ scale_x_grates functions and explicitly specifying a format for the date
 labels:
 
 ```{r}
+#| fig.alt: >
+#|   Bar chart of epiweekly incidence (by week of infection) covering the time
+#|   from March 2014 to April 2015 inclusive. The graph peaks around September
+#|   2014. The "descent" from the peak tapers off slower than the initial
+#|   "ascent". Six labels of the form 'year-month-day' are evenly spread along
+#|   the x-axis and aligned at the start of the corresponding bars.
 week_plot + scale_x_grates_epiweek(format = "%Y-%m-%d")
 ```
 
 
 ## Period {#period}
 
-**period** objects are stored as the integer number, starting at 0L, of periods
+period objects are stored as the integer number, starting at 0L, of periods
 since the Unix Epoch (1970-01-01) and a specified offset. Here periods are taken
 to mean groupings of `n` consecutive days.
 
-Like with yearweek objects, period objects can be constructed directly via a 
+Like yearweek objects, a period object can be constructed directly via a 
 call to `new_period()` but more easily via the `as_period()` coercion function.
 `as_period()` takes 3 arguments; `x`, the vector (normally a Date or POSIXt) you
 wish to group, `n`, the integer number of days you wish to group, and `offset`,
@@ -160,6 +177,12 @@ I.e. `offset <- offset %% n` and values of `x` stored relative to this scaled
 offset.
 
 ```{r}
+#| fig.alt: >
+#|   Bar chart of incidence (by period of infection) covering the time
+#|   from March 2014 to April 2015 inclusive. The graph peaks around September
+#|   2014. The "descent" from the peak tapers off slower than the initial
+#|   "ascent". Six labels of the form 'year-month-day' are evenly spread along
+#|   the x-axis and aligned at the start of the corresponding bars.
 # calculate the total number for across 14 day periods with no offset.
 # note - 0L is the default value for the offset but we specify it explicitly
 # here for added clarity
@@ -171,23 +194,24 @@ period_dat <- aggregate(
 
 head(period_dat)
 
-# lower date bounds are used for the x axis
 ggplot(period_dat, aes(period, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
+```
 
-# using a date as an offset
-start <- as.Date("2020-01-03")
-dates <- start + 0:9
+We can also use a date as an offset
+
+```{r}
+dates <- as.Date("2020-01-03") + 0:9
 offset <- as.Date("2020-01-01")
 data.frame(dates, period = as_period(dates, n = 7L, offset = offset))
 ```
 
 ## yearmonth, yearquarter and year {#yearxxx}
 
-**yearmonth**, **yearquarter** and **year** objects are stored as the integer
+yearmonth, yearquarter and year objects are stored as the integer
 number of months/quarters/years (starting at 0L) since the Unix Epoch
 (1970-01-01). 
 
@@ -195,25 +219,46 @@ Similar to other grates objects we provide both coercion and construction
 functions.
 
 ```{r}
-# calculate the monthly number of cases
+#| fig.alt: >
+#|   Bar chart of monthly incidence (by date of infection) covering the time
+#|   from March 2014 to April 2015 inclusive. The graph peaks around September
+#|   2014. The "descent" from the peak tapers off slower than the initial
+#|   "ascent". Labels of the form 'year-month' are evenly spread along
+#|   the x-axis and aligned at the centred of the corresponding bars.
 (month_dat <- aggregate(
     list(cases = dat),
     by = list(month = as_yearmonth(dat)),
     FUN = length
 ))
 
-# plot with centred labels
 (month_plot <-
     ggplot(month_dat, aes(month, cases)) +
     geom_col(width = 1, colour = "white") +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab(""))
+```
 
-# again we can have non-centred date labels by applying the associated scale
+Again we can have non-centred date labels by applying the associated scale
+
+```{r}
+#| fig.alt: >
+#|   Bar chart of monthly incidence (by date of infection) covering the time
+#|   from March 2014 to April 2015 inclusive. The graph peaks around September
+#|   2014. The "descent" from the peak tapers off slower than the initial
+#|   "ascent". Labels of the form 'year-month-day' are evenly spread along
+#|   the x-axis aligned to the start of the corresponding bars.
 month_plot + scale_x_grates_yearmonth(format = "%Y-%m-%d")
+```
 
-# yearquarter works similarly
+yearquarter works similarly
+
+```{r}
+#| fig.alt: >
+#|   Bar chart of quarterly incidence (by date of infection) covering the time
+#|   from 2014-Q1 to 2015-Q2 inclusive. The graph peaks over quarters 3 and 4
+#|   in 2014. Labels on the x-axis and of the form 'year-quarter' are centred on
+#|   the corresponding bars.
 (quarter_dat <- aggregate(
     list(cases = dat),
     by = list(quarter = as_yearquarter(dat)),
@@ -225,8 +270,15 @@ ggplot(quarter_dat, aes(quarter, cases)) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
+```
 
-# year also works similarly
+As does year
+
+```{r}
+#| fig.alt: >
+#|   Bar chart of yearly incidence (by date of infection) for 2014 and 2015.
+#|   There were lots more cases in 2014 compared to 2015 (Roughly speaking 
+#|   3000 v 700).
 (year_dat <- aggregate(
     list(cases = dat),
     by = list(year = as_year(dat)),
@@ -238,7 +290,9 @@ ggplot(year_dat, aes(year, cases)) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
+```
 
+```{r}
 # Construction functions can also be used
 yearmonth(2022L, 11L)
 yearquarter(2022L, 4L)
@@ -247,16 +301,21 @@ year(2022L)
 
 ## month {#month}
 
-**month** objects are stored as the integer number of n-month groups (starting
+month objects are stored as the integer number of n-month groups (starting
 at 0L) since the Unix Epoch (1970-01-01). Here n-months is taken to mean a
 'grouping of n consecutive months'.
 
-`<grates_month>` objects can be constructed directly from integers via the
-`new_month()` function and through coercion via the `as_month()` function.
-`as_period()` takes 2 arguments; `x`, the vector (normally a Date or POSIXt) you
-wish to group, `n`, the integer number of months you wish to group.
+month objects can be constructed directly from integers via the `new_month()`
+function and through coercion via the `as_month()` function. `as_period()` takes
+two arguments; `x`, the vector (normally a Date or POSIXt) you wish to group and
+`n`, the integer number of months you wish to group.
 
 ```{r}
+#| fig.alt: >
+#|   Bar chart of bimonthly incidence (by date of infection) covering the time
+#|   from March 2014 to April 2015 inclusive. The graph peaks around
+#|   September/October 2014. Labels of the form 'year-month-day' are evenly
+#|   spread along the x-axis aligned to the start of the corresponding bars.
 # calculate the bimonthly number of cases
 (bimonth_dat <- aggregate(
     list(cases = dat),
@@ -279,12 +338,17 @@ centred by default. To obtain centred labels you must explicitly set the format
 to NULL in the scale:
 
 ```{r}
+#| fig.alt: >
+#|   Bar chart of bimonthly incidence (by date of infection) covering the time
+#|   from March 2014 to April 2015 inclusive. The graph peaks around
+#|   September/October 2014. Labels of the form 'year-month to year-month' are
+#|   evenly spread along the x-axis centred on the corresponding bars.
 bimonth_plot + scale_x_grates_month(format = NULL, n = 2L)
 ```
 
 # Methods and other functionality
 
-For all `grates` objects we have added many methods and operations to ensure
+For all grates objects we have added many methods and operations to ensure
 logical and consistent behaviour. The following sections utilise the unique
 epiweeks from the earlier example:
 
@@ -294,7 +358,7 @@ weeks <- week_dat$week
 
 ## Accessing boundary values and checking contents
 
-Some times it is useful to access both the starting dates covered by `grates`
+Some times it is useful to access both the starting dates covered by grates
 objects as well as the end dates. To this end we provide functions
 `date_start()` and `date_end()`.
 
@@ -334,7 +398,7 @@ try(seq(from = minw, to = 999, by = 6L))
 
 ## Addition and subtraction
 
-Addition (subtraction) of wholenumbers will add (subtract) the corresponding
+Addition (subtraction) of whole numbers will add (subtract) the corresponding
 number of weeks to (from) the object
 
 ```{r}
@@ -354,7 +418,7 @@ Subtraction of two yearweek objects gives the difference in weeks between them
 transform(dat, difference = plus4 - minus4)
 ```
 
-`<grates_epiweek>` objects can be combined with themselves but not other classes
+epiweek objects can be combined with themselves but not other classes
 (assuming an epiweek object is the first entry).
 
 ```{r}
