@@ -54,7 +54,7 @@ new_month <- function(x = integer(), n) {
     if (!.is_scalar_whole(n))
         stop("`n` must be an integer of length 1.")
     n <- as.integer(n)
-    if (n == 1L)
+    if (n <= 1L)
         stop("`n` must be greater than 1. If single month groupings are required please use `yearmonth()`.")
 
     .new_month(x = x, n = n)
@@ -93,7 +93,7 @@ is_month <- function(xx) {
 print.grates_month <- function(x, format = "%Y-%b", sep = "to", ...) {
     # replicate the header as in vctrs
     n <- length(x)
-    cat("<grates_yearmonth[", n, "]>\n", sep = "")
+    cat("<grates_month[", n, "]>\n", sep = "")
     if (n)
         print(format.grates_month(x, format = format, sep = sep))
     invisible(x)

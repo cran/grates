@@ -1,3 +1,9 @@
+# grates 1.3.0
+
+* (Re)introduction of the `<grates_int_period>` object and associated scale
+  function. This functionality should be viewed as experimental for the time
+  being and is marked as such in the documentation.
+
 # grates 1.2.2
 
 * All images in the vignette now have alt text.
