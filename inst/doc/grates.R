@@ -1,13 +1,5 @@
-## ----include = FALSE----------------------------------------------------------
-knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>",
-    fig.align = "center",
-    fig.width = 7,
-    fig.height = 5
-)
+litedown::reactor(error = TRUE, message = TRUE, print = NA, fig.height = 5)
 
-## -----------------------------------------------------------------------------
 library(grates)
 
 # Choose some consecutive dates that begin on a Friday
@@ -32,7 +24,6 @@ weekdays(as.Date(epiwk))
 
 weekdays(as.Date(isowk))
 
-## -----------------------------------------------------------------------------
 library(ggplot2)
 
 # use simulated linelist data from the outbreaks package
@@ -54,10 +45,8 @@ head(week_dat)
     geom_col(width = 1, colour = "white") +
     theme_bw())
 
-## -----------------------------------------------------------------------------
 week_plot + scale_x_grates_epiweek(format = "%Y-%m-%d")
 
-## -----------------------------------------------------------------------------
 # calculate the total number for across 14 day periods with no offset.
 # note - 0L is the default value for the offset but we specify it explicitly
 # here for added clarity
@@ -75,12 +64,10 @@ ggplot(period_dat, aes(period, cases)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
-## -----------------------------------------------------------------------------
 dates <- as.Date("2020-01-03") + 0:9
 offset <- as.Date("2020-01-01")
 data.frame(dates, period = as_period(dates, n = 7L, offset = offset))
 
-## -----------------------------------------------------------------------------
 (month_dat <- aggregate(
     list(cases = dat),
     by = list(month = as_yearmonth(dat)),
@@ -94,10 +81,8 @@ data.frame(dates, period = as_period(dates, n = 7L, offset = offset))
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab(""))
 
-## -----------------------------------------------------------------------------
 month_plot + scale_x_grates_yearmonth(format = "%Y-%m-%d")
 
-## -----------------------------------------------------------------------------
 (quarter_dat <- aggregate(
     list(cases = dat),
     by = list(quarter = as_yearquarter(dat)),
@@ -110,7 +95,6 @@ ggplot(quarter_dat, aes(quarter, cases)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
-## -----------------------------------------------------------------------------
 (year_dat <- aggregate(
     list(cases = dat),
     by = list(year = as_year(dat)),
@@ -123,13 +107,11 @@ ggplot(year_dat, aes(year, cases)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("")
 
-## -----------------------------------------------------------------------------
 # Construction functions can also be used
 yearmonth(2022L, 11L)
 yearquarter(2022L, 4L)
 year(2022L)
 
-## -----------------------------------------------------------------------------
 # calculate the bimonthly number of cases
 (bimonth_dat <- aggregate(
     list(cases = dat),
@@ -145,13 +127,10 @@ year(2022L)
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab(""))
 
-## -----------------------------------------------------------------------------
 bimonth_plot + scale_x_grates_month(format = NULL, n = 2L)
 
-## -----------------------------------------------------------------------------
 weeks <- week_dat$week
 
-## -----------------------------------------------------------------------------
 dat <- weeks[1:5]
 data.frame(
     week = dat,
@@ -160,10 +139,8 @@ data.frame(
     contains.2014.04.14 = as.Date("2014-04-14") %during% dat
 )
 
-## -----------------------------------------------------------------------------
 identical(as.Date(weeks), date_start(weeks))
 
-## -----------------------------------------------------------------------------
 # min, max and range
 (minw <- min(weeks))
 (maxw <- max(weeks))
@@ -173,21 +150,17 @@ identical(as.Date(weeks), date_start(weeks))
 seq(from = minw, to = maxw, by = 6L)
 
 # but will error informatively if `to` is a different class
-try(seq(from = minw, to = 999, by = 6L))
+seq(from = minw, to = 999, by = 6L)
 
-## -----------------------------------------------------------------------------
 dat <- head(week_dat)
 (dat <- transform(dat, plus4 = week + 4L, minus4 = week - 4L))
 
-## -----------------------------------------------------------------------------
-try(transform(dat, willerror = week + week))
+transform(dat, willerror = week + week)
 
-## -----------------------------------------------------------------------------
 transform(dat, difference = plus4 - minus4)
 
-## -----------------------------------------------------------------------------
 c(minw, maxw)
 identical(c(minw, maxw), rangew)
 
-try(c(minw, 1L))
+c(minw, 1L)
 

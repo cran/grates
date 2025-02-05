@@ -1,7 +1,7 @@
-62fb54a75a2b12a8b76c05dbfcd02557 *DESCRIPTION
+d1bc14082edefa79ada49964f69aabda *DESCRIPTION
 d61c89def7cdddcdc4d86e1c0a85cb78 *LICENSE
 a7b2943a20276e37af63171d32343f71 *NAMESPACE
-1f95b0cddc59f466adedf8588c316d8e *NEWS.md
+3d9e853480ee57444a9da9cb40068666 *NEWS.md
 89a943c2176134baf252c4112440f2b7 *R/accessors.R
 7648cacb161b5576f1b8a27bae7adf58 *R/boundaries.R
 55aae5b9d9ec303385d1b254f1f74dbb *R/epiweek.R
@@ -24,11 +24,11 @@ bd6718607d071be8bd3c4cd3183bddef *R/year.R
 868520d53f95a11bf7dbc08ca3314614 *R/yearmonth.R
 aebf8b04d469f59a90ec997c7a0b6108 *R/yearquarter.R
 1dff62db47c937b9fcb49b80de5822ea *R/yearweek.R
-c4364c7606ef17fa70cfd3187667b52b *README.md
+b048a8a991e08fdc310e23419d1e5ed6 *README.md
 172b274c58116f01d15ca720dc569790 *build/vignette.rds
-5cc56f5fa2f3d034ca7b69f77d422b6b *inst/doc/grates.R
-c21878af8035ba41540fb035d7b537b9 *inst/doc/grates.Rmd
-287672ef84e194a97a179d70f570320c *inst/doc/grates.html
+fc0ea1f50d09bd5dbdbdb56c5fb23f73 *inst/doc/grates.R
+8bc395988961ada00c34df3f861a0867 *inst/doc/grates.Rmd
+0cbfe04c5ef3302b8724cba8d1bae253 *inst/doc/grates.html
 f756b519e408c089ebcde5a01d86e449 *man/as_epiweek.Rd
 b35d494083ace267238b880ce38437e1 *man/as_int_period.Rd
 55882cae26001ef82884a7060d44bca3 *man/as_isoweek.Rd
@@ -115,4 +115,4 @@ ae28f482e6137d34d1abb69c3ea834d2 *tests/testthat/test-plots.R
 56b091dbd5f1594565bf427a780126fb *tests/testthat/test-yearmonth.R
 ad0db4bef44d451b6a4d5ddeff29b87a *tests/testthat/test-yearquarter.R
 c1bde195afe9540dc84a0d05675dfab9 *tests/testthat/test-yearweek.R
-c21878af8035ba41540fb035d7b537b9 *vignettes/grates.Rmd
+8bc395988961ada00c34df3f861a0867 *vignettes/grates.Rmd

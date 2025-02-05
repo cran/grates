@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.4.0
+Version: 1.4.1
 Authors@R: 
     c(
       person(
@@ -20,14 +20,14 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Depends: R (>= 3.6.0)
-Suggests: knitr, ggplot2, scales, vctrs, rlang, markdown, outbreaks,
-        testthat (>= 3.0.0),
-VignetteBuilder: knitr
+Suggests: ggplot2, scales, vctrs, rlang, litedown, outbreaks, testthat
+        (>= 3.0.0),
+VignetteBuilder: litedown
 Config/testthat/edition: 3
 Imports: utils
 NeedsCompilation: no
-Packaged: 2025-01-17 13:39:09 UTC; tim
+Packaged: 2025-02-05 11:57:01 UTC; tim
 Author: Tim Taylor [aut, cre] (<https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2025-01-17 15:10:06 UTC
+Date/Publication: 2025-02-05 12:30:03 UTC
