@@ -1,3 +1,8 @@
+# grates 1.4.2
+
+* Reworking of manual pages and vignette.
+* `scale_x_grates_period()` can now handle a `date` value for `offset`.
+
 # grates 1.4.1
 
 * No longer downloads css/js when building vignette.
