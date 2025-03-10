@@ -1,3 +1,7 @@
+# grates 1.4.3
+
+* Fixes vignette build.
+
 # grates 1.4.2
 
 * Reworking of manual pages and vignette.
