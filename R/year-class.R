@@ -263,7 +263,7 @@ as.POSIXlt.grates_year <- function(x, tz = "UTC", ...) {
     if (tz != "UTC")
         stop("<grates_year> objects can only be converted to UTC. If other timezones are required, first convert to <Date> and then proceed as desired.")
     x <- .month_to_days((unclass(x) - 1970L) * 12L)
-    as.POSIXlt(x * 86400, tz = "UTC", origin = .POSIXct(0, tz = "UTC"))
+    as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 
 # -------------------------------------------------------------------------
@@ -367,6 +367,12 @@ Ops.grates_year <- function(e1, e2) {
         },
         stopf("%s is not compatible with <grates_year> objects.", op)
     )
+}
+
+# -------------------------------------------------------------------------
+#' @export
+is.numeric.grates_year <- function(x) {
+    FALSE
 }
 
 # ------------------------------------------------------------------------- #

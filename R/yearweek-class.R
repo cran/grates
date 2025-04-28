@@ -212,11 +212,11 @@ as_yearweek.POSIXt <- function(x, firstday = 1L, ...) {
 #' @rdname yearweek_class
 #' @export
 as_yearweek.character <- function(
-        x,
-        firstday = 1L,
-        format,
-        tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
-        ...
+    x,
+    firstday = 1L,
+    format,
+    tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
+    ...
 ) {
     if (!missing(format)) {
         if (length(format) > 1L)
@@ -239,11 +239,11 @@ as_yearweek.character <- function(
 #' @rdname yearweek_class
 #' @export
 as_yearweek.factor <- function(
-        x,
-        firstday = 1L,
-        format,
-        tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
-        ...
+    x,
+    firstday = 1L,
+    format,
+    tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
+    ...
 ) {
     x <- as.character(x)
     as_yearweek.character(x, firstday = firstday, format = format, ...)
@@ -469,7 +469,7 @@ as.POSIXlt.grates_yearweek <- function(x, tz = "UTC", ...) {
     }
     firstday <- .firstday_from_class(x)
     x <- as.double(unclass(x)) * 7 + (firstday - 4)
-    as.POSIXlt(x * 86400, tz = "UTC", origin = .POSIXct(0, tz = "UTC"))
+    as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 
 # -------------------------------------------------------------------------
@@ -596,6 +596,12 @@ Ops.grates_yearweek <- function(e1, e2) {
     )
 }
 
+# -------------------------------------------------------------------------
+#' @export
+is.numeric.grates_yearweek <- function(x) {
+    FALSE
+}
+
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
 # -------------------------------- INTERNALS ------------------------------ #
@@ -671,6 +677,7 @@ Ops.grates_yearweek <- function(e1, e2) {
 }
 
 # -------------------------------------------------------------------------
+#' @importFrom fastymd fymd
 .yearweek <- function(year, week, firstday) {
     na_values <- is.na(year) | is.na(week)
     invalid <- !logical(length(na_values))
@@ -685,11 +692,10 @@ Ops.grates_yearweek <- function(e1, e2) {
         year <- year[!invalid]
         week <- week[!invalid]
         # convert numeric values to date
-        jan4 <- strptime(sprintf("%d-01-04", year), format = "%Y-%m-%d", tz = "UTC")
-        wday <- jan4$wday
-        tmp <- jan4 - ((wday + 7L - firstday) %% 7) * 86400
-        tmp <- tmp + (week - 1) * 7L * 86400
-        res <- as.Date(tmp)
+        jan4 <- fymd(year, 1, 4)
+        # shift the date to start at the first week of the year
+        date <- jan4 - (.wday_relative_to_firstday(jan4, firstday = firstday) - 1)
+        res <- date + (week - 1) * 7L
         res <- as_yearweek.Date(res, firstday = firstday)
         out[!invalid] <- res
     }
@@ -698,22 +704,27 @@ Ops.grates_yearweek <- function(e1, e2) {
 }
 
 # -------------------------------------------------------------------------
+#' @importFrom fastymd fymd
 .last_week_in_year <- function(year = integer(), firstday = 1L) {
-    #x <- as.Date(sprintf("%d-12-28", year))
-    x <- .Date(.days_before_year(year) + .days_before_yearmonth(year, 12L) - 719162L + 27L)
-    wday <- strptime(sprintf("%d-12-28", year), format = "%Y-%m-%d", tz = "UTC")$wday
-    wday <- 1L + (wday + (7L - firstday)) %% 7L
-    midweek <- x + (4L - wday)
+    dec28 <- fymd(year, 12, 28)
+    wday <- .wday_relative_to_firstday(dec28, firstday = firstday)
+    midweek <- dec28 + (4L - wday)
     .seven_day_week_in_year(date = midweek)
 }
 
 # -------------------------------------------------------------------------
+#' @importFrom fastymd fymd get_year
 .seven_day_week_in_year <- function(date) {
-    x <- .as_utc_posixlt_from_int(date)
-    yr <- x$year + 1900L
-    jan1 <- sprintf("%d-01-01", yr)
-    jan1 <- as.Date(strptime(jan1, format = "%Y-%m-%d", tz = "UTC"))
-    res <- 1 + (unclass(date) - unclass(jan1)) %/% 7
-    attributes(res) <- NULL
-    res
+    yr <- get_year(date)
+    jan1 <- fymd(yr, 1, 1)
+    1 + (unclass(date) - unclass(jan1)) %/% 7
 }
+
+.wday_relative_to_firstday <- function(date, firstday) {
+    # firstday = 1
+    date <- (unclass(date) + 4L) %% 7L
+    1L + (unclass(date) + (7L - firstday)) %% 7L
+}
+
+
+

@@ -145,20 +145,17 @@ as_yearmonth.default <- function(x, ...) {
 }
 
 # -------------------------------------------------------------------------
+#' @importFrom fastymd get_ymd
 #' @rdname yearmonth_class
 #' @export
 as_yearmonth.Date <- function(x, ...) {
 
-    # convert to posixlt (this will always be UTC when called on a date)
-    x <- as.POSIXlt(x)
-
-    # calculate the year
-    yr <- x$year + 1900L
+    # get year, month and day
+    x <- get_ymd(x)
 
     # calculate the month relative to unix epoch
-    mon <- (yr - 1970L) * 12L + x$mon
+    mon <- (x$year - 1970L) * 12L + (x$month - 1L)
 
-    # TODO - could mon ever be double here? Maybe call as_yearmonth again?
     .new_yearmonth(mon)
 }
 
@@ -377,7 +374,7 @@ as.POSIXlt.grates_yearmonth <- function(x, tz = "UTC", ...) {
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
     x <- .month_to_days(unclass(x))
-    as.POSIXlt(x * 86400, tz = "UTC", origin = .POSIXct(0, tz = "UTC"))
+    as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 
 # -------------------------------------------------------------------------
@@ -482,6 +479,12 @@ Ops.grates_yearmonth <- function(e1, e2) {
         },
         stopf("%s is not compatible with <grates_yearmonth> objects.", op)
     )
+}
+
+# -------------------------------------------------------------------------
+#' @export
+is.numeric.grates_yearmonth <- function(x) {
+    FALSE
 }
 
 # ------------------------------------------------------------------------- #

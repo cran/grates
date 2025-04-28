@@ -408,7 +408,7 @@ as.POSIXlt.grates_period <- function(x, tz = "UTC", ...) {
     n <- attr(x, "n")
     offset <- attr(x, "offset")
     days <- as.integer(x) * n + offset
-    as.POSIXlt(days * 86400, tz = "UTC", origin = .POSIXct(0, tz = "UTC"))
+    as.POSIXlt(.POSIXct(days * 86400, tz = "UTC"), tz = "UTC")
 }
 
 # -------------------------------------------------------------------------
@@ -550,6 +550,12 @@ Ops.grates_period <- function(e1, e2) {
         },
         stopf("%s is not compatible with <grates_period> objects.", op)
     )
+}
+
+# -------------------------------------------------------------------------
+#' @export
+is.numeric.grates_period <- function(x) {
+    FALSE
 }
 
 

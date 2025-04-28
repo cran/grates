@@ -167,10 +167,10 @@ as_epiweek.POSIXt <- function(x, ...) {
 #' @rdname epiweek_class
 #' @export
 as_epiweek.character <- function(
-        x,
-        format,
-        tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
-        ...
+    x,
+    format,
+    tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
+    ...
 ) {
     if (!missing(format)) {
         if (length(format) > 1L)
@@ -194,10 +194,10 @@ as_epiweek.character <- function(
 #' @rdname epiweek_class
 #' @export
 as_epiweek.factor <- function(
-        x,
-        format,
-        tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
-        ...
+    x,
+    format,
+    tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),
+    ...
 ) {
     x <- as.character(x)
     as_epiweek.character(x, format = format, tryFormats = tryFormats, ...)
@@ -355,7 +355,7 @@ as.POSIXlt.grates_epiweek <- function(x, tz = "UTC", ...) {
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
     x <- as.double(unclass(x)) * 7 + 3
-    as.POSIXlt(x * 86400, tz = "UTC", origin = .POSIXct(0, tz = "UTC"))
+    as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 
 # -------------------------------------------------------------------------
@@ -462,6 +462,12 @@ Ops.grates_epiweek <- function(e1, e2) {
         },
         stopf("%s is not compatible with <grates_epiweek> objects.", op)
     )
+}
+
+# -------------------------------------------------------------------------
+#' @export
+is.numeric.grates_epiweek <- function(x) {
+    FALSE
 }
 
 
