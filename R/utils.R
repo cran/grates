@@ -27,11 +27,13 @@ stopf <- function(fmt, ..., .use_call = TRUE, .call = sys.call(-1L)) {
 .assert_grate <- function(x, arg = deparse(substitute(x)), call = sys.call(-1L)) {
     .assert_not_missing(x = x, arg = arg, call = call)
 
+    # nolint start: commas_linter. Aesthetics
     grates_classes <- c(
         "grates_yearweek" , "grates_isoweek", "grates_epiweek",
         "grates_yearmonth", "grates_month"  , "grates_yearquarter",
         "grates_year"     , "grates_period"
     )
+    # nolint end
 
     if (!inherits(x, grates_classes))
         stopf("`%s` must be a <grates> object.", arg, .call = call)
@@ -49,7 +51,7 @@ stopf <- function(fmt, ..., .use_call = TRUE, .call = sys.call(-1L)) {
 .is_scalar_whole <- function(x, tol = .Machine$double.eps^0.5) {
     if (is.integer(x) && length(x) == 1L)
         return(TRUE)
-    if (is.double(x) && length(x) == 1L && (abs(x - round(x)) < tol))
+    if (is.double(x) && length(x) == 1L && is.finite(x) && (abs(x - round(x)) < tol))
         return(TRUE)
     FALSE
 }
@@ -97,4 +99,20 @@ stopf <- function(fmt, ..., .use_call = TRUE, .call = sys.call(-1L)) {
     }
 
     list(x, y)
+}
+
+
+# -------------------------------------------------------------------------
+.make_floored_integer <- function(x, .call = sys.call(-1L)) {
+
+    if (is.vector(x, "double"))
+        return(as.integer(floor(x)))
+
+    if (is.integer(x))
+        return(x)
+
+    # otherwise error
+    msg <- gettextf("`%s` must be integer.", deparse(substitute(x)))
+    cond <- errorCondition(msg, call = .call[1L])
+    stop(cond)
 }

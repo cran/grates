@@ -86,7 +86,7 @@
 #' # character coercion assumes date input by default
 #' as_epiweek("2019-05-03")
 #'
-#' # character coercion can handle YYYY-Www format too
+#' # character coercion can handle YYYY-Wxx format too
 #' as_epiweek("2019-W12", format = "yearweek")
 #'
 #' # construction
@@ -108,19 +108,8 @@ NULL
 #' @export
 epiweek <- function(year = integer(), week = integer()) {
 
-    # check year is integerish
-    if (is.vector(year, "double")) {
-        year <- as.integer(floor(year))
-    } else if (!is.integer(year)) {
-        stop("`year` must be integer.")
-    }
-
-    # check week is integerish
-    if (is.vector(week, "double")) {
-        week <- as.integer(floor(week))
-    } else if (!is.integer(week)) {
-        stop("`week` must be integer.")
-    }
+    year <- .make_floored_integer(year)
+    week <- .make_floored_integer(week)
 
     # check compatible lengths
     tmp <- .recycle(year, week)
@@ -207,11 +196,7 @@ as_epiweek.factor <- function(
 #' @rdname epiweek_class
 #' @export
 new_epiweek <- function(x = integer()) {
-    if (is.vector(x, "double")) {
-        x <- as.integer(floor(x))
-    } else if (!is.integer(x)) {
-        stop("`x` must be integer.")
-    }
+    x <- .make_floored_integer(x)
     .new_epiweek(x)
 }
 
@@ -245,26 +230,23 @@ vec_ptype_full.grates_epiweek <- function(x, ...) {"epiweek"}
 #' @export
 `[.grates_epiweek` <- function(x, ..., drop = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[[.grates_epiweek` <- function(x, ..., drop = TRUE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[<-.grates_epiweek` <- function(x, ..., value) {
     if (!inherits(value, "grates_epiweek"))
-        stop("Can only assign <grates_epiweek> objects in to an <grates_epiweek> object.")
+        stop("Can only assign a <grates_epiweek> object into a <grates_epiweek> object.")
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -275,16 +257,14 @@ vec_ptype_full.grates_epiweek <- function(x, ...) {"epiweek"}
 #' @export
 rep.grates_epiweek <- function(x, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 unique.grates_epiweek <- function(x, incomparables = FALSE, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -378,24 +358,21 @@ as.data.frame.grates_epiweek <- as.data.frame.vector
 #' @export
 min.grates_epiweek <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 max.grates_epiweek <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 range.grates_epiweek <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -458,7 +435,7 @@ Ops.grates_epiweek <- function(e1, e2) {
             } else if (inherits(e1, "grates_epiweek") && .is_whole(e2)) {
                 return(.new_epiweek(unclass(e1) - as.integer(e2)))
             }
-            stop("Can only subtract whole numbers and other <grates_epiweek> objects from <grates_epiweek> objects.")
+            stop("Can only subtract whole numbers and other <grates_epiweek> objects from <grates_epiweek> objects.") # nolint: line_length_linter.
         },
         stopf("%s is not compatible with <grates_epiweek> objects.", op)
     )
@@ -477,13 +454,9 @@ is.numeric.grates_epiweek <- function(x) {
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
 
-.new_epiweek <- function(x) {
-    class(x) <- "grates_epiweek"
-    x
-}
+.new_epiweek <- function(x) `class<-`(x, "grates_epiweek")
 
 .epiweek <- function(year, week) {
     out <- .yearweek(year = year, week = week, firstday = 7L)
-    class(out) <- "grates_epiweek"
-    out
+    `class<-`(out, "grates_epiweek")
 }

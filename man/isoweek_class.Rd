@@ -82,7 +82,7 @@ That is, the number of seven day periods from 1969-12-29.
 \details{
 \code{isoweek()} is a constructor for \verb{<grates_isoweek>} objects. It takes a
 vector of year and vector of week values as inputs. Length 1 inputs will be
-recycled to the length of the other input and \code{double} vectors will again be
+recycled to the length of the other input and \code{double} vectors will be
 converted to integer via \code{as.integer(floor(x))}.
 
 \code{as_isoweek()} is a generic for conversion to \verb{<grates_isoweek>}.
@@ -109,7 +109,7 @@ as_isoweek(as.POSIXct("2019-03-04 01:01:01", tz = "America/New_York"))
 # character coercion assumes date input by default
 as_isoweek("2019-05-03")
 
-# character coercion can handle YYYY-Www format too
+# character coercion can handle YYYY-Wxx format too
 as_isoweek("2019-W12", format = "yearweek")
 
 # construction
@@ -127,7 +127,8 @@ stopifnot(
 \references{
 Wikipedia contributors. (2025, January 15). ISO week date.
 In Wikipedia, The Free Encyclopedia.
-Retrieved 09:19, March 6, 2025, from https://en.wikipedia.org/w/index.php?title=ISO_week_date&oldid=1269568343
+Retrieved 09:19, March 6, 2025, from
+https://en.wikipedia.org/w/index.php?title=ISO_week_date&oldid=1269568343
 }
 \seealso{
 The \link[=yearweek_class]{yearweek} and \link[=epiweek_class]{epiweek} classes.

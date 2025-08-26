@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.5.0
+Version: 1.6.0
 Authors@R: 
     c(
       person(
@@ -15,6 +15,7 @@ Description: Provides a coherent interface and implementation for creating
     grouped date classes.
 URL: https://www.reconverse.org/grates/,
         https://github.com/reconverse/grates
+BugReports: https://github.com/reconverse/grates/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.2
@@ -28,8 +29,8 @@ Config/testthat/parallel: true
 Config/testthat/start-first: plots, refactoring
 Imports: utils, fastymd
 NeedsCompilation: no
-Packaged: 2025-04-28 12:23:49 UTC; tim
-Author: Tim Taylor [aut, cre] (<https://orcid.org/0000-0002-8587-7113>)
+Packaged: 2025-08-26 15:32:14 UTC; tim
+Author: Tim Taylor [aut, cre] (ORCID: <https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2025-04-28 12:40:07 UTC
+Date/Publication: 2025-08-26 16:20:07 UTC

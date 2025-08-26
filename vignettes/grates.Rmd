@@ -3,8 +3,8 @@ title: "Grouped dates"
 output:
     html:
         meta:
-            css: ["@default@1.13.67", "@copy-button@1.13.67", "@callout@1.13.67", "@article@1.13.67"]
-            js: ["@sidenotes@1.13.67", "@center-img@1.13.67", "@copy-button@1.13.67", "@callout@1.13.67", "@toc-highlight@1.13.67"]
+            css: ["@default@1.14.14", "@copy-button@1.14.14", "@callout@1.14.14", "@article@1.14.14"]
+            js: ["@sidenotes@1.14.14", "@center-img@1.14.14", "@copy-button@1.14.14", "@callout@1.14.14", "@toc-highlight@1.14.14"]
         options:
             toc: true
             js_highlight:
@@ -41,7 +41,7 @@ To start, let us first look at the daily data.
 ```{r}
 #| fig.alt: >
 #|   Bar chart of daily incidence (by date of infection) covering 2014-03-19
-#|   to 2015-04-27 inclusive. The graph peaks somewhere between September and 
+#|   to 2015-04-27 inclusive. The graph peaks somewhere between September and
 #|   November 2014. The "descent" from the peak tapers off slower than the
 #|   initial "ascent".
 library(grates)
@@ -183,11 +183,12 @@ calculation purposes, `offset` is scaled relative to `n`, that is
 :::
 
 Like yearweek objects, a period object is easily created with the `as_period()`
-coercion function. `as_period()` takes 3 arguments; `x`, the vector (normally a
-Date or POSIXt) you wish to group, `n`, the integer number of days you wish to
-group, and `offset`, the value you wish to start counting groups from relative
-to the Unix Epoch. For convenience, `offset` can be given as a date you want
-periods to be relative to (internally this date is converted to integer).
+coercion function. `as_period()` takes 3 arguments; `x`, the vector you wish to
+group, `n`, the integer number of days you wish to group, and `offset`, the
+value you wish to start counting groups from relative to the Unix Epoch. For
+convenience, `offset` can be given as a date you want periods to be relative to
+(internally this date is converted to integer). For both Date and POSIXt objects
+`offset` defaults to the minimum value of the input `x`.
 
 In the example below we aggregate by 14 day periods offset from the earliest
 case:
@@ -297,7 +298,7 @@ As does year
 ```{r}
 #| fig.alt: >
 #|   Bar chart of yearly incidence (by date of infection) for 2014 and 2015.
-#|   There were lots more cases in 2014 compared to 2015 (Roughly speaking 
+#|   There were lots more cases in 2014 compared to 2015 (Roughly speaking
 #|   3000 v 700).
 (year_dat <- with(daily,
     aggregate(

@@ -129,19 +129,8 @@ yearweek <- function(year = integer(), week = integer(), firstday = 1L) {
     #        in the error message. Need to document this when I remember
     #        reasoning.
 
-    # check year is integerish
-    if (is.vector(year, "double")) {
-        year <- as.integer(floor(year))
-    } else if (!is.integer(year)) {
-        stop("`year` must be integer.")
-    }
-
-    # check week is integerish
-    if (is.vector(week, "double")) {
-        week <- as.integer(floor(week))
-    } else if (!is.integer(week)) {
-        stop("`week` must be integer.")
-    }
+    year <- .make_floored_integer(year)
+    week <- .make_floored_integer(week)
 
     # check firstday
     if (length(firstday) != 1L)
@@ -341,23 +330,21 @@ vec_ptype_full.grates_yearweek_sunday <- function(x, ...) {"yearweek-sun"}
 #' @export
 `[.grates_yearweek` <- function(x, ..., drop = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[[.grates_yearweek` <- function(x, ..., drop = TRUE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[<-.grates_yearweek` <- function(x, ..., value) {
     if (!inherits(value, "grates_yearweek"))
-        stop("Can only assign <grates_yearweek> objects in to an <grates_yearweek> object.")
+        stop("Can only assign a <grates_yearweek> object into a <grates_yearweek> object.")
     fdx <- .firstday_from_class(x)
     fdv <- .firstday_from_class(value)
     if (isTRUE(fdx != fdv))
@@ -375,16 +362,14 @@ vec_ptype_full.grates_yearweek_sunday <- function(x, ...) {"yearweek-sun"}
 #' @export
 rep.grates_yearweek <- function(x, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 unique.grates_yearweek <- function(x, incomparables = FALSE, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -492,24 +477,21 @@ as.data.frame.grates_yearweek <- as.data.frame.vector
 #' @export
 min.grates_yearweek <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 max.grates_yearweek <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 range.grates_yearweek <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -580,7 +562,7 @@ Ops.grates_yearweek <- function(e1, e2) {
                         weekdiff <- (unclass(e1) - unclass(e2))
                         return(as.difftime(weekdiff, units = "weeks"))
                     }
-                    stop("<grates_yearweek> objects must have the same first day of the week to perform subtraction.")
+                    stop("<grates_yearweek> objects must have the same first day of the week to perform subtraction.") # nolint: line_length_linter.
                 }
                 stop("Can only subtract from a <grates_yearweek> object, not vice-versa.")
             } else if (inherits(e1, "grates_yearweek") && is.integer(e2)) {
@@ -590,7 +572,7 @@ Ops.grates_yearweek <- function(e1, e2) {
                 fd <- .firstday_from_class(e1)
                 return(.new_yearweek(unclass(e1) - as.integer(e2), firstday = fd))
             }
-            stop("Can only subtract whole numbers and other <grates_yearweek> objects from <grates_yearweek> objects.")
+            stop("Can only subtract whole numbers and other <grates_yearweek> objects from <grates_yearweek> objects.") # nolint: line_length_linter.
         },
         stopf("%s is not compatible with <grates_yearweek> objects.", op)
     )
@@ -623,37 +605,37 @@ is.numeric.grates_yearweek <- function(x) {
 
 # -------------------------------------------------------------------------
 .new_yearweek_monday <- function(x) {
-    structure(x, class = c("grates_yearweek_monday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_monday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
 .new_yearweek_tuesday <- function(x) {
-    structure(x, class = c("grates_yearweek_tuesday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_tuesday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
 .new_yearweek_wednesday <- function(x) {
-    structure(x, class = c("grates_yearweek_wednesday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_wednesday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
 .new_yearweek_thursday <- function(x) {
-    structure(x, class = c("grates_yearweek_thursday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_thursday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
 .new_yearweek_friday <- function(x) {
-    structure(x, class = c("grates_yearweek_friday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_friday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
 .new_yearweek_saturday <- function(x) {
-    structure(x, class = c("grates_yearweek_saturday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_saturday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
 .new_yearweek_sunday <- function(x) {
-    structure(x, class = c("grates_yearweek_sunday", "grates_yearweek"))
+    `class<-`(x, c("grates_yearweek_sunday", "grates_yearweek"))
 }
 
 # -------------------------------------------------------------------------
@@ -681,10 +663,17 @@ is.numeric.grates_yearweek <- function(x) {
 .yearweek <- function(year, week, firstday) {
     na_values <- is.na(year) | is.na(week)
     invalid <- !logical(length(na_values))
-    if(!all(na_values))
-        invalid[!na_values] <- week[!na_values] > .last_week_in_year(year = year[!na_values], firstday = firstday)
-    if (any(invalid))
-        warning("Some entries invalid for given `year` and `week` values. Returning these as NA.", call. = FALSE)
+    if (!all(na_values)) {
+        invalid[!na_values] <- week[!na_values] > .last_week_in_year(year = year[!na_values], firstday = firstday) # nolint: line_length_linter.
+    }
+
+    if (any(invalid)) {
+        warning( # nolint: condition_call_linter.
+            "Some entries invalid for given `year` and `week` values. ",
+            "Returning these as NA.", call. = FALSE
+        )
+    }
+
 
     out <- rep.int(NA_integer_, length(year))
 
@@ -725,6 +714,3 @@ is.numeric.grates_yearweek <- function(x) {
     date <- (unclass(date) + 4L) %% 7L
     1L + (unclass(date) + (7L - firstday)) %% 7L
 }
-
-
-

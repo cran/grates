@@ -17,7 +17,7 @@
 #' be recycled to the length of the other input and `double` vectors will
 #' be converted to integer via `as.integer(floor(x))`.
 #'
-#' `as_yearmonth()` is a generic for coercing input in to `<grates_yearmonth>`.
+#' `as_yearmonth()` is a generic for coercing input into `<grates_yearmonth>`.
 #' - Character input is first parsed using `as.Date()`.
 #' - POSIXct and POSIXlt are converted with their timezone respected.
 #'
@@ -97,26 +97,15 @@ NULL
 #' @export
 yearmonth <- function(year = integer(), month = integer()) {
 
-    # check year is integerish
-    if (is.vector(year, "double")) {
-        year <- as.integer(floor(year))
-    } else if (!is.integer(year)) {
-        stop("`year` must be integer.")
-    }
-
-    # check month is integerish
-    if (is.vector(month, "double")) {
-        month <- as.integer(floor(month))
-    } else if (!is.integer(month)) {
-        stop("`month` must be integer.")
-    }
+    year <- .make_floored_integer(year)
+    month <- .make_floored_integer(month)
 
     # check month bounded above and below
     idx <- month < 1L | month > 12L
     if (any(idx, na.rm = TRUE)) {
         first <- which.max(idx)
         stopf(
-            "Months must be integer and between 1 and 12 (inclusive) or NA. Entry %d is not (it equals %d).",
+            "Months must be integer and between 1 and 12 (inclusive) or NA. Entry %d is not (it equals %d).", # nolint: line_length_linter.
             first, month[first]
         )
     }
@@ -190,11 +179,7 @@ as_yearmonth.factor <- function(x, ...) {
 #' @rdname yearmonth_class
 #' @export
 new_yearmonth <- function(x = integer()) {
-    if (is.vector(x, "double")) {
-        x <- as.integer(floor(x))
-    } else if (!is.integer(x)) {
-        stop("`x` must be integer.")
-    }
+    x <- .make_floored_integer(x)
     .new_yearmonth(x = x)
 }
 
@@ -263,26 +248,23 @@ vec_ptype_full.grates_yearmonth <- function(x, ...) {"grates_yearmonth"}
 #' @export
 `[.grates_yearmonth` <- function(x, ..., drop = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[[.grates_yearmonth` <- function(x, ..., drop = TRUE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[<-.grates_yearmonth` <- function(x, ..., value) {
     if (!inherits(value, "grates_yearmonth"))
-        stop("Can only assign <grates_yearmonth> objects in to an <grates_yearmonth> object.")
+        stop("Can only assign a <grates_yearmonth> object into a <grates_yearmonth> object.")
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -293,16 +275,14 @@ vec_ptype_full.grates_yearmonth <- function(x, ...) {"grates_yearmonth"}
 #' @export
 rep.grates_yearmonth <- function(x, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 unique.grates_yearmonth <- function(x, incomparables = FALSE, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -397,24 +377,21 @@ as.data.frame.grates_yearmonth <- as.data.frame.vector
 #' @export
 min.grates_yearmonth <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 max.grates_yearmonth <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 range.grates_yearmonth <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -475,7 +452,7 @@ Ops.grates_yearmonth <- function(e1, e2) {
             } else if (inherits(e1, "grates_yearmonth") && .is_whole(e2)) {
                 return(.new_yearmonth(unclass(e1) - as.integer(e2)))
             }
-            stop("Can only subtract whole numbers and other <grates_yearmonth> objects from <grates_yearmonth> objects.")
+            stop("Can only subtract whole numbers and other <grates_yearmonth> objects from <grates_yearmonth> objects.") # nolint: line_length_linter.
         },
         stopf("%s is not compatible with <grates_yearmonth> objects.", op)
     )
@@ -493,10 +470,7 @@ is.numeric.grates_yearmonth <- function(x) {
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
 
-.new_yearmonth <- function(x = integer()) {
-    class(x) <- "grates_yearmonth"
-    x
-}
+.new_yearmonth <- function(x = integer()) {`class<-`(x, "grates_yearmonth")}
 
 .yearmonth <- function(year, month) {
     out <- (year - 1970L) * 12L + (month - 1L)

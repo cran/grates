@@ -14,15 +14,15 @@
 \usage{
 as_period(x, n, ...)
 
-\method{as_period}{default}(x, n = 1L, offset = 0L, ...)
+\method{as_period}{default}(x, n = 1L, offset, ...)
 
-\method{as_period}{Date}(x, n = 1L, offset = 0L, ...)
+\method{as_period}{Date}(x, n = 1L, offset = min(x, na.rm = TRUE), ...)
 
-\method{as_period}{POSIXt}(x, n = 1L, offset = 0L, ...)
+\method{as_period}{POSIXt}(x, n = 1L, offset = min(x, na.rm = TRUE), ...)
 
-\method{as_period}{character}(x, n = 1L, offset = 0L, ...)
+\method{as_period}{character}(x, n = 1L, offset = 0, ...)
 
-\method{as_period}{factor}(x, n = 1L, offset = 0L, ...)
+\method{as_period}{factor}(x, n = 1L, offset = 0, ...)
 
 new_period(x = integer(), n = 1L, offset = 0L)
 
@@ -40,17 +40,17 @@ Epoch (1970-01-01) and a specified offset.}
 
 Number of days that are being grouped.}
 
-\item{...}{Only used for character input where additional arguments are passed through
-to \code{as.Date()}.}
+\item{...}{Only used for character/factor input where additional arguments are passed
+through to \code{as.Date()}.}
 
-\item{offset}{\verb{[integer]} or, for \code{as_period()}, a \verb{[date]}.
-
-Value you wish to start counting periods from relative to the Unix Epoch:
+\item{offset}{Value you wish to start counting periods from relative to the Unix Epoch:
 \itemize{
 \item For integer values this is stored scaled by \code{n}
 (\code{offset <- as.integer(offset) \%\% n}).
 \item For date values this is first converted to an integer offset
 (\code{offset <- floor(as.numeric(offset))}) and then scaled via \code{n} as above.
+\item Character / factor inputs are first coerced to Dates and then handled
+accordingly.
 }}
 }
 \value{
@@ -69,7 +69,7 @@ calculation purposes, \code{offset} is scaled relative to \code{n}
 (i.e. \code{offset <- offset \%\% n}) and values of \code{x} stored relative to this
 scaled offset.
 
-\code{as_period()} is a generic for coercing input in to \verb{<grates_period>} objects.
+\code{as_period()} is a generic for coercing input into \verb{<grates_period>} objects.
 It is the recommended way for constructing period objects as it allows the
 \code{offset} to be specified as a \code{date} (rather than an integer value relative to
 the Unix Epoch).

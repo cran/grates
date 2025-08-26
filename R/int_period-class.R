@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------
 #' @details
 #'
-#' `as_int_period()` is a generic for coercing input in to `<grates_int_period>`
+#' `as_int_period()` is a generic for coercing input into `<grates_int_period>`
 #' objects. For numeric input it coerces it's input `x` first via
 #' `x <- as.integer(floor(x))` and then via integer division by `n` (i.e.
 #' `x %/% n`).
@@ -204,7 +204,7 @@ as_int_period <- function(x, n, ...) {
 #' @export
 `[<-.grates_int_period` <- function(x, ..., value) {
     if (!inherits(value, "grates_int_period"))
-        stop("Can only assign <grates_int_period> objects in to a <grates_int_period> object.")
+        stop("Can only assign a <grates_int_period> object into a <grates_int_period> object.")
     nx <- attr(x, "n")
     nv <- attr(value, "n")
     if (isTRUE(nx != nv))
@@ -417,7 +417,7 @@ Ops.grates_int_period <- function(e1, e2) {
                     if (isTRUE(all.equal(n1, n2))) {
                         return(c(unclass(e1) - unclass(e2)))
                     }
-                    stop("<grates_int_period> objects must have the same integer grouping to perform subtraction.")
+                    stop("<grates_int_period> objects must have the same integer grouping to perform subtraction.") # nolint: line_length_linter.
                 }
                 stop("Can only subtract from a <grates_int_period> object, not vice-versa.")
             } else if (inherits(e1, "grates_int_period") && .is_whole(e2)) {
@@ -425,7 +425,7 @@ Ops.grates_int_period <- function(e1, e2) {
                 n <- attr(e1, "n")
                 return(.new_int_period(unclass(e1) - e2, n = n))
             }
-            stop("Can only subtract whole numbers and other <grates_int_period> objects from <grates_int_period> objects.")
+            stop("Can only subtract whole numbers and other <grates_int_period> objects from <grates_int_period> objects.") # nolint: line_length_linter.
         },
         stopf("%s is not compatible with <grates_int_period> objects.", op)
     )

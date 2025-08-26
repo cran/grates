@@ -16,7 +16,7 @@
 #' will be recycled to the length of the other input and `double` vectors will
 #' be converted to integer via `as.integer(floor(x))`.
 #'
-#' `as_yearquarter()` is a generic for coercing input in to `<grates_yearquarter>`.
+#' `as_yearquarter()` is a generic for coercing input into `<grates_yearquarter>`.
 #' - Character input is first parsed using `as.Date()`.
 #' - POSIXct and POSIXlt are converted with their timezone respected.
 #'
@@ -86,26 +86,15 @@ NULL
 #' @export
 yearquarter <- function(year = integer(), quarter = integer()) {
 
-    # check year is integerish
-    if (is.vector(year, "double")) {
-        year <- as.integer(floor(year))
-    } else if (!is.integer(year)) {
-        stop("`year` must be integer.")
-    }
-
-    # check quarter is integerish
-    if (is.vector(quarter, "double")) {
-        quarter <- as.integer(floor(quarter))
-    } else if (!is.integer(quarter)) {
-        stop("`quarter` must be integer.")
-    }
+    year <- .make_floored_integer(year)
+    quarter <- .make_floored_integer(quarter)
 
     # check quarter bounded above and below
     idx <- quarter < 1L | quarter > 4L
     if (any(idx, na.rm = TRUE)) {
         first <- which.max(idx)
         stopf(
-            "quarters must be integer and between 1 and 4 (inclusive) or NA. Entry %d is not (it equals %d).",
+            "quarters must be integer and between 1 and 4 (inclusive) or NA. Entry %d is not (it equals %d).", # nolint: line_length_linter.
             first, quarter[first]
         )
     }
@@ -182,12 +171,7 @@ as_yearquarter.factor <- function(x, ...) {
 #' @rdname yearquarter_class
 #' @export
 new_yearquarter <- function(x = integer()) {
-    if (is.vector(x, "double")) {
-        x <- as.integer(floor(x))
-    } else if (!is.integer(x)) {
-        stop("`x` must be integer.")
-    }
-
+    x <- .make_floored_integer(x)
     .new_yearquarter(x = x)
 }
 
@@ -233,26 +217,23 @@ vec_ptype_full.grates_yearquarter <- function(x, ...) {"yearquarter"}
 #' @export
 `[.grates_yearquarter` <- function(x, ..., drop = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[[.grates_yearquarter` <- function(x, ..., drop = TRUE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 `[<-.grates_yearquarter` <- function(x, ..., value) {
     if (!inherits(value, "grates_yearquarter"))
-        stop("Can only assign <grates_yearquarter> objects in to an <grates_yearquarter> object.")
+        stop("Can only assign a <grates_yearquarter> object into a <grates_yearquarter> object.")
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -263,16 +244,14 @@ vec_ptype_full.grates_yearquarter <- function(x, ...) {"yearquarter"}
 #' @export
 rep.grates_yearquarter <- function(x, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 unique.grates_yearquarter <- function(x, incomparables = FALSE, ...) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -369,24 +348,21 @@ as.data.frame.grates_yearquarter <- as.data.frame.vector
 #' @export
 min.grates_yearquarter <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 max.grates_yearquarter <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
 #' @export
 range.grates_yearquarter <- function(x, ..., na.rm = FALSE) {
     out <- NextMethod()
-    class(out) <- class(x)
-    out
+    `class<-`(out, class(x))
 }
 
 # -------------------------------------------------------------------------
@@ -447,7 +423,7 @@ Ops.grates_yearquarter <- function(e1, e2) {
             } else if (inherits(e1, "grates_yearquarter") && .is_whole(e2)) {
                 return(.new_yearquarter(unclass(e1) - as.integer(e2)))
             }
-            stop("Can only subtract whole numbers and other <grates_yearquarter> objects from <grates_yearquarter> objects.")
+            stop("Can only subtract whole numbers and other <grates_yearquarter> objects from <grates_yearquarter> objects.") # nolint: line_length_linter.
         },
         stopf("%s is not compatible with <grates_yearquarter> objects.", op)
     )
@@ -465,9 +441,7 @@ is.numeric.grates_yearquarter <- function(x) {
 # ------------------------------------------------------------------------- #
 # ------------------------------------------------------------------------- #
 
-.new_yearquarter <- function(x = integer()) {
-    structure(x, class = "grates_yearquarter")
-}
+.new_yearquarter <- function(x = integer()) {`class<-`(x, "grates_yearquarter")}
 
 .yearquarter <- function(year, quarter) {
     month <- (quarter * 3L) - 2L

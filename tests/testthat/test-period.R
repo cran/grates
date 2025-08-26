@@ -26,8 +26,8 @@ test_that("period, pre-epoch dates work", {
     dates2 <- seq.Date(from = as.Date("1900-01-01") - 28, length.out = 4, by = 7)
     storage.mode(dates) <- "double" # needed for R <= 4.1.3
     storage.mode(dates2) <- "double" # needed for R <= 4.1.3
-    expect_identical(as.Date(as_period(dates, n=7, offset = as.integer(as.Date("1900-01-01")))), dates)
-    expect_identical(as.Date(as_period(dates, n=7, offset = as.integer(as.Date("1900-01-01"))) - 4), dates2)
+    expect_identical(as.Date(as_period(dates, n = 7, offset = as.integer(as.Date("1900-01-01")))), dates)
+    expect_identical(as.Date(as_period(dates, n = 7, offset = as.integer(as.Date("1900-01-01"))) - 4), dates2)
 })
 
 test_that("period, january 1 dates", {
@@ -151,16 +151,15 @@ test_that("period operators and math work", {
     # comparison operators ----------------------------------------------------
     x <- Sys.Date()
     dat <- as_period(x, n = 2L)
-    expect_true(dat == dat)
+    expect_true(dat == dat) # nolint: expect_comparison_linter. False-positive
     expect_false(dat != dat)
-    expect_true(dat == dat)
-    expect_true(dat <= dat + 1)
-    expect_true(dat >= dat - 1)
-    expect_true(dat < dat + 1)
-    expect_true(dat > dat - 1)
+    expect_lte(dat, dat + 1)
+    expect_gte(dat, dat - 1)
+    expect_lt(dat, dat + 1)
+    expect_gt(dat, dat - 1)
     expect_true(dat != dat + 1)
     expect_error(
-        dat == TRUE,
+        dat == TRUE, # nolint: redundant_equals_linter.
         "Can only compare <grates_period> objects with <grates_period> objects.",
         fixed = TRUE
     )
@@ -291,7 +290,7 @@ test_that("period, miscellaneous work", {
 
     expect_error(
         as_period(Sys.Date(), offset = 1:2),
-        "`offset` must be an integer or date of length 1.",
+        "`offset` must be of length 1.",
         fixed = TRUE
     )
 
@@ -319,6 +318,12 @@ test_that("period, miscellaneous work", {
         fixed = TRUE
     )
 
+    expect_error(
+        new_period(0, offset = Inf),
+        "`offset` must be an integer of length 1.",
+        fixed = TRUE
+    )
+
     dat <- Sys.Date()
     dat <- c(dat, dat - 45L)
     dat <- as_period(dat)
@@ -335,7 +340,7 @@ test_that("period, miscellaneous work", {
         "`by` must be an integer of length 1.",
         fixed = TRUE
     )
-    dat2 <- as_period(as.Date(dat+11), n = 3)
+    dat2 <- as_period(as.Date(dat + 11), n = 3)
     expect_error(
         seq(dat, dat2, by = 2),
         "`to` must have the same period grouping as `from`",
@@ -349,9 +354,9 @@ test_that("period, miscellaneous work", {
     )
     expect_identical(as.integer(new_period(100L)), 100L)
     expect_identical(as.double(new_period(100L)), 100)
-    expect_identical(min(c(dat, dat+11)), dat)
-    expect_identical(max(c(dat, dat+11)), dat+11)
-    expect_identical(range(seq(dat, dat + 12, by = 2L)), c(dat, dat+12))
+    expect_identical(min(c(dat, dat + 11)), dat)
+    expect_identical(max(c(dat, dat + 11)), dat + 11)
+    expect_identical(range(seq(dat, dat + 12, by = 2L)), c(dat, dat + 12))
     expect_error(
         any(dat),
         "`any()` is not supported for <grates_period> objects.",
@@ -391,6 +396,7 @@ test_that("period, miscellaneous work", {
     )
 
     expect_false(is.numeric(dat1))
+
 })
 
 test_that("period boundary functions work", {
@@ -401,3 +407,25 @@ test_that("period boundary functions work", {
     expect_identical(date_start(periods), starts)
     expect_identical(date_end(periods), ends)
 })
+
+test_that("period, offset default works", {
+    dates <- as.Date("2020-01-01") + (0:61)
+    dat <- as_period(dates, n = 2, offset = as.integer(as.Date("2020-01-01")))
+    expect_identical(as_period(dates, n = 2), expected = dat)
+
+    dates <- as.Date("2020-01-01") + (1:61)
+    dat <- as_period(dates, n = 2, offset = as.integer(as.Date("2020-01-02")))
+    expect_identical(as_period(dates, n = 2), expected = dat)
+})
+
+test_that("period, character offset works", {
+    dates <- as.Date("2020-01-01") + (0:61)
+    dat <- as_period(dates, n = 2, offset = "2020-01-01")
+    expect_identical(as_period(dates, n = 2), expected = dat)
+
+    dates <- as.Date("2020-01-01") + (1:61)
+    dat <- as_period(dates, n = 2, offset = "2020-01-02")
+    expect_identical(as_period(dates, n = 2), expected = dat)
+})
+
+

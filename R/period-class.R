@@ -18,7 +18,7 @@
 #' (i.e. `offset <- offset %% n`) and values of `x` stored relative to this
 #' scaled offset.
 #'
-#' `as_period()` is a generic for coercing input in to `<grates_period>` objects.
+#' `as_period()` is a generic for coercing input into `<grates_period>` objects.
 #' It is the recommended way for constructing period objects as it allows the
 #' `offset` to be specified as a `date` (rather than an integer value relative to
 #' the Unix Epoch).
@@ -50,18 +50,20 @@
 #'
 #' Number of days that are being grouped.
 #'
-#' @param offset `[integer]` or, for `as_period()`, a `[date]`.
+#' @param offset
 #'
 #' Value you wish to start counting periods from relative to the Unix Epoch:
 #' - For integer values this is stored scaled by `n`
 #'   (`offset <- as.integer(offset) %% n`).
 #' - For date values this is first converted to an integer offset
 #'   (`offset <- floor(as.numeric(offset))`) and then scaled via `n` as above.
+#' - Character / factor inputs are first coerced to Dates and then handled
+#'   accordingly.
 #'
 #' @param ...
 #'
-#' Only used for character input where additional arguments are passed through
-#' to `as.Date()`.
+#' Only used for character/factor input where additional arguments are passed
+#' through to `as.Date()`.
 #'
 # -------------------------------------------------------------------------
 #' @return
@@ -91,14 +93,14 @@ as_period <- function(x, n, ...) {
 # -------------------------------------------------------------------------
 #' @rdname period_class
 #' @export
-as_period.default <- function(x, n = 1L, offset = 0L, ...) {
+as_period.default <- function(x, n = 1L, offset, ...) {
     stopf("Not implemented for class [%s].", toString(class(x)))
 }
 
 # -------------------------------------------------------------------------
 #' @rdname period_class
 #' @export
-as_period.Date <- function(x, n = 1L, offset = 0L, ...) {
+as_period.Date <- function(x, n = 1L, offset = min(x, na.rm = TRUE), ...) {
 
     if (...length()) {
         dot_names <- names(list(...))
@@ -106,10 +108,18 @@ as_period.Date <- function(x, n = 1L, offset = 0L, ...) {
             stop("The `origin` argument is now defunct. Please use `offset`.")
     }
 
-    x <- as.integer(floor(unclass(x)))
     if (!.is_scalar_whole(n))
         stop("`n` must be an integer of length 1.")
+
+    if (length(offset) != 1L)
+        stop("`offset` must be of length 1.")
+
+    x <- as.integer(floor(unclass(x)))
+
     n <- as.integer(n)
+
+    if(is.character(offset) || is.factor(offset))
+        offset <- as.Date(offset, ...)
 
     if (inherits(offset, "Date"))
         offset <- floor(as.numeric(offset))
@@ -125,7 +135,7 @@ as_period.Date <- function(x, n = 1L, offset = 0L, ...) {
 # -------------------------------------------------------------------------
 #' @rdname period_class
 #' @export
-as_period.POSIXt <- function(x, n = 1L, offset = 0L, ...) {
+as_period.POSIXt <- function(x, n = 1L,  offset = min(x, na.rm = TRUE), ...) {
 
     if (...length()) {
         dot_names <- names(list(...))
@@ -140,7 +150,7 @@ as_period.POSIXt <- function(x, n = 1L, offset = 0L, ...) {
 # -------------------------------------------------------------------------
 #' @rdname period_class
 #' @export
-as_period.character <- function(x, n = 1L, offset = 0L, ...) {
+as_period.character <- function(x, n = 1L, offset = 0, ...) {
 
     if (...length()) {
         dot_names <- names(list(...))
@@ -151,13 +161,14 @@ as_period.character <- function(x, n = 1L, offset = 0L, ...) {
     out <- as.Date(x, ...)
     if (all(is.na(out)))
         stop("Unable to parse any entries of `x` as Dates.")
+
     as_period.Date(x = out, n = n, offset = offset)
 }
 
 # -------------------------------------------------------------------------
 #' @rdname period_class
 #' @export
-as_period.factor <- function(x, n = 1L, offset = 0L, ...) {
+as_period.factor <- function(x, n = 1L, offset = 0, ...) {
     if (...length()) {
         dot_names <- names(list(...))
         if (any(dot_names == "origin"))
@@ -172,11 +183,7 @@ as_period.factor <- function(x, n = 1L, offset = 0L, ...) {
 #' @rdname period_class
 #' @export
 new_period <- function(x = integer(), n = 1L, offset = 0L) {
-    if (is.vector(x, "double")) {
-        x <- as.integer(floor(x))
-    } else if (!is.integer(x)) {
-        stop("`x` must be integer.")
-    }
+    x <- .make_floored_integer(x)
 
     if (!.is_scalar_whole(n))
         stop("`n` must be an integer of length 1.")
@@ -217,6 +224,11 @@ is_period <- function(xx) {
 #'
 #' @param ...
 #' Not currently used.
+#'
+#' @return
+#' For `format()`, a character vector representing the formatted input.
+#' `print()` is called for the side effect of printing to screen and thus
+#' returns the input `<grates_period>` object invisibly.
 #'
 # -------------------------------------------------------------------------
 #' @export
@@ -283,7 +295,7 @@ vec_ptype_full.grates_period <- function(x, ...) {"grates_period"}
 #' @export
 `[<-.grates_period` <- function(x, ..., value) {
     if (!inherits(value, "grates_period"))
-        stop("Can only assign <grates_period> objects in to an <grates_period> object.")
+        stop("Can only assign a <grates_period> object into a <grates_period> object.")
 
     nx <- attr(x, "n")
     nv <- attr(value, "n")
@@ -503,7 +515,7 @@ Ops.grates_period <- function(e1, e2) {
             } else if (op == "!=") {
                 return(TRUE)
             }
-            stop("Can only compare <grates_period> objects with the same period grouping and offset.")
+            stop("Can only compare <grates_period> objects with the same period grouping and offset.") # nolint: line_length_linter
         }
         stop("Can only compare <grates_period> objects with <grates_period> objects.")
     }
@@ -538,7 +550,7 @@ Ops.grates_period <- function(e1, e2) {
                     if (isTRUE(all.equal(n1, n2)) && isTRUE(all.equal(offset1, offset2))) {
                         return((as.integer(e1) - as.integer(e2)))
                     }
-                    stop("<grates_period> objects must have the same period grouping and offset to perform subtraction.")
+                    stop("<grates_period> objects must have the same period grouping and offset to perform subtraction.") # nolint: line_length_linter.
                 }
                 stop("Can only subtract from a <grates_period> object, not vice-versa.")
             } else if (inherits(e1, "grates_period") && .is_whole(e2)) {
@@ -546,7 +558,7 @@ Ops.grates_period <- function(e1, e2) {
                 offset <- attr(e1, "offset")
                 return(.new_period(as.integer(e1) - e2, n = n, offset = offset))
             }
-            stop("Can only subtract whole numbers and other <grates_period> objects from <grates_period> objects.")
+            stop("Can only subtract whole numbers and other <grates_period> objects from <grates_period> objects.") # nolint: line_length_linter.
         },
         stopf("%s is not compatible with <grates_period> objects.", op)
     )
