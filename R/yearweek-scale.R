@@ -18,14 +18,19 @@
 #'
 #' @param format
 #'
-#' Format to use if "Date" scales are required.
+#' Format to use if "Date" or year/week scales are required.
 #'
 #' If NULL (default) then labels are in the standard yearweek format (YYYY-Wxx).
 #'
 #' If "week" then the labels are of the form Www (e.g. W37).
 #'
+#' If "year" then labels are of the form YYYY (e.g. 2020).
+#'
 #' Otherwise the value is used by `format.Date()` and can be any input
 #' acceptable by that function.
+#'
+#' Note that when date scales are requested the grate labels are first coerced
+#' via `as.Date()`.
 #'
 #' @param firstday `[integer]`
 #'
@@ -223,7 +228,7 @@ scale_type.grates_yearweek <- function(x) {
 # ------------------------------------------------------------------------- #
 .grates_yearweek_trans <- function(breaks, n.breaks, firstday, format) {
 
-    shift <- if (is.null(format) || format == "week") 0 else 0.5
+    shift <- if (is.null(format) || format == "week" || format == "year") 0 else 0.5
 
     # breaks function
     brks <- function(x) {
@@ -245,6 +250,8 @@ scale_type.grates_yearweek <- function(x) {
         } else if (format == "week") {
             x <- format.grates_yearweek(x)
             sub(pattern = ".*-", replacement = "", x = x, perl = TRUE)
+        } else if (format == "year") {
+            format(get_year.grates_yearweek(x))
         } else {
             x <- as.Date.grates_yearweek(x)
             format(x, format)

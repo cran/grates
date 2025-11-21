@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.6.0
+Version: 1.7.0
 Authors@R: 
     c(
       person(
@@ -18,7 +18,7 @@ URL: https://www.reconverse.org/grates/,
 BugReports: https://github.com/reconverse/grates/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends: R (>= 3.6.0)
 Suggests: ggplot2, scales, vctrs, rlang, litedown, outbreaks, testthat
         (>= 3.0.0)
@@ -29,8 +29,8 @@ Config/testthat/parallel: true
 Config/testthat/start-first: plots, refactoring
 Imports: utils, fastymd
 NeedsCompilation: no
-Packaged: 2025-08-26 15:32:14 UTC; tim
+Packaged: 2025-11-21 09:26:59 UTC; tim
 Author: Tim Taylor [aut, cre] (ORCID: <https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2025-08-26 16:20:07 UTC
+Date/Publication: 2025-11-21 09:50:02 UTC
