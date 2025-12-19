@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.7.0
+Version: 1.7.1
 Authors@R: 
     c(
       person(
@@ -25,12 +25,11 @@ Suggests: ggplot2, scales, vctrs, rlang, litedown, outbreaks, testthat
 VignetteBuilder: litedown
 Config/testthat/load-all: list(export_all = FALSE, helpers = FALSE)
 Config/testthat/edition: 3
-Config/testthat/parallel: true
 Config/testthat/start-first: plots, refactoring
 Imports: utils, fastymd
 NeedsCompilation: no
-Packaged: 2025-11-21 09:26:59 UTC; tim
+Packaged: 2025-12-19 09:11:05 UTC; tim
 Author: Tim Taylor [aut, cre] (ORCID: <https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2025-11-21 09:50:02 UTC
+Date/Publication: 2025-12-19 13:40:02 UTC

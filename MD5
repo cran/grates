@@ -1,7 +1,7 @@
-d3953340a52d0120e5e3f935352c61ad *DESCRIPTION
+d5503702fa75c2b0b4d36162e68a9a80 *DESCRIPTION
 d61c89def7cdddcdc4d86e1c0a85cb78 *LICENSE
 fe990eec563506ee728a7b225d050c0c *NAMESPACE
-cbd9b1d476be7203c446d83e47e32569 *NEWS.md
+2513e0ac4355a43803466dd52ac2c629 *NEWS.md
 7dcc71940926dfcc723da3529e6ee737 *R/accessors.R
 fcf8f8321a7aeade2879781f50a13884 *R/boundaries.R
 84aa16acb1fe57b34798c4385a639535 *R/during.R
@@ -15,7 +15,7 @@ f91ee72d414c6b33b2a3db855224a242 *R/isoweek-class.R
 9ff908c4e806be5449d8fb3bebfe3827 *R/month-class.R
 8229ace66226278077579a4352307b8a *R/month-scale.R
 85f048656fbb10ada81df9f980cf37c5 *R/month-utils.R
-73a0819acbfcd52903127a56dfd9a83a *R/period-class.R
+1e3a1c331d1a4a7ce86e293ea752ef7a *R/period-class.R
 e870ace3e63bfb6ffc42de94e756f6d0 *R/period-scale.R
 679558d67f51d58b18b64738cb27867d *R/utils.R
 d4980f63ba76e662c60ce31f07b824fb *R/year-class.R
@@ -98,7 +98,7 @@ bd60794774a24f3030938255a9021d05 *tests/testthat/_snaps/plots/yearweek_thursday.
 546c626fcd79b517e9d729f1947de834 *tests/testthat/test-int_period.R
 d8ec2378035278c1a56e3bbee4e3236d *tests/testthat/test-isoweek.R
 38fb603d8bf90448cee135b69342a41e *tests/testthat/test-month.R
-3e0b1781741ceb28a255260f740a47dd *tests/testthat/test-period.R
+880adb8572bdb2692fef2db4c06b856f *tests/testthat/test-period.R
 5bf6c4436e862423ae64210d4d87ad56 *tests/testthat/test-plots.R
 d14d810127ae05bebf542493bd6cc599 *tests/testthat/test-refactoring.R
 4e3a5a5b78b9639208a0a53b75a62129 *tests/testthat/test-year.R
