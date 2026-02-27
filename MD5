@@ -1,7 +1,7 @@
-d5503702fa75c2b0b4d36162e68a9a80 *DESCRIPTION
+f8f37f28ecb067df0a494390a0ae025f *DESCRIPTION
 d61c89def7cdddcdc4d86e1c0a85cb78 *LICENSE
 fe990eec563506ee728a7b225d050c0c *NAMESPACE
-2513e0ac4355a43803466dd52ac2c629 *NEWS.md
+1d00e541c454a7f3a0c1c23894631f4d *NEWS.md
 7dcc71940926dfcc723da3529e6ee737 *R/accessors.R
 fcf8f8321a7aeade2879781f50a13884 *R/boundaries.R
 84aa16acb1fe57b34798c4385a639535 *R/during.R
@@ -26,10 +26,10 @@ acdc9d3702ab08ae900f412d0d69d9b3 *R/yearmonth-class.R
 41b7e6c4d3af32e1b234f33fc833a5cf *R/yearquarter-scale.R
 68b2e10f83aa4bfc881d67f358afbeb4 *R/yearweek-class.R
 ed491f8fcd920f9f8eed8ef2fa0affb2 *R/yearweek-scale.R
-74a1a9a4cc54e24dc28bf9a8d6d25b7d *build/vignette.rds
+458520e09186dd6e7474530aa53897f3 *build/vignette.rds
 54f31d43b014864c69f24fc5703f42c2 *inst/doc/grates.R
-de84d0348c139bfdf567310b372c7e89 *inst/doc/grates.Rmd
-0d84944c17dd2726873b434c6a058b21 *inst/doc/grates.html
+c7a074642c96a68bb382551973edded2 *inst/doc/grates.Rmd
+834905efce00993e5a676c500d9ed876 *inst/doc/grates.html
 b0718229a2cc557de59986a4cfdaea2d *man/boundaries.Rd
 7d452b91daac9cedcff56d078e820906 *man/epiweek_class.Rd
 2570f4a509c3091b43e9b0c5861e5bf1 *man/grapes-during-grapes.Rd
@@ -105,4 +105,5 @@ d14d810127ae05bebf542493bd6cc599 *tests/testthat/test-refactoring.R
 1cfdfcb722ab1190931bd34d5b2912fe *tests/testthat/test-yearmonth.R
 a5b064c1a07922e65795797cbeff09d7 *tests/testthat/test-yearquarter.R
 e5207be69b56894d447bfb5e376a7c10 *tests/testthat/test-yearweek.R
-de84d0348c139bfdf567310b372c7e89 *vignettes/grates.Rmd
+a8bdf0e9c623af6096dffae6e82acd50 *vignettes/assets/tweaks.css
+c7a074642c96a68bb382551973edded2 *vignettes/grates.Rmd

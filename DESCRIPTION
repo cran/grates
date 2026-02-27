@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.7.1
+Version: 1.7.2
 Authors@R: 
     c(
       person(
@@ -28,8 +28,8 @@ Config/testthat/edition: 3
 Config/testthat/start-first: plots, refactoring
 Imports: utils, fastymd
 NeedsCompilation: no
-Packaged: 2025-12-19 09:11:05 UTC; tim
+Packaged: 2026-02-27 14:34:15 UTC; tim
 Author: Tim Taylor [aut, cre] (ORCID: <https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2025-12-19 13:40:02 UTC
+Date/Publication: 2026-02-27 15:50:03 UTC
