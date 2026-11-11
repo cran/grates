@@ -150,10 +150,7 @@ as_isoweek.default <- function(x, ...) {
 #' @rdname isoweek_class
 #' @export
 as_isoweek.Date <- function(x, ...) {
-    firstday <- 1L
-    x <- as.integer(floor(unclass(x)))
-    x <- (x + 4L - firstday) %/% 7L
-    .new_isoweek(x = x)
+    .Call(C_as_grouped_week_from_date, x, "grates_isoweek", 1L)
 }
 
 # -------------------------------------------------------------------------
@@ -321,7 +318,7 @@ as.double.grates_isoweek <- function(x, ...) as.double(unclass(x))
 # -------------------------------------------------------------------------
 #' @export
 as.Date.grates_isoweek <- function(x, ...) {
-    .Date(as.double(unclass(x)) * 7L - 3L)
+    .Call(C_as_date_from_isoweek, x)
 }
 
 # -------------------------------------------------------------------------
@@ -333,7 +330,7 @@ as.POSIXct.grates_isoweek <- function(x, tz = "UTC", ...) {
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
     }
-    x <- as.double(unclass(x)) * 7 - 3
+    x <- unclass(as.Date.grates_isoweek(x))
     .POSIXct(x * 86400, tz = "UTC")
 }
 
@@ -346,7 +343,7 @@ as.POSIXlt.grates_isoweek <- function(x, tz = "UTC", ...) {
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
     }
-    x <- as.double(unclass(x)) * 7 - 3
+    x <- unclass(as.Date.grates_isoweek(x))
     as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 

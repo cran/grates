@@ -184,9 +184,7 @@ as_yearweek.Date <- function(x, firstday = 1L, ...) {
     if (firstday < 1L || firstday > 7L || is.na(firstday))
         stop("`firstday` must be an integer between 1 (Monday) and 7 (Sunday).")
 
-    x <- as.integer(floor(unclass(x)))
-    x <- (x + 4L - firstday) %/% 7L
-    .new_yearweek(x = x, firstday = firstday)
+    .Call(C_as_grouped_week_from_date, x, "grates_yearweek", firstday)
 }
 
 # -------------------------------------------------------------------------
@@ -425,8 +423,7 @@ as.double.grates_yearweek <- function(x, ...) {
 #' @export
 as.Date.grates_yearweek <- function(x, ...) {
     firstday <- .firstday_from_class(x)
-    .Date(as.double(unclass(x)) * 7 + (firstday - 4))
-}
+    .Call(C_as_date_from_yearweek, x, firstday)}
 
 # -------------------------------------------------------------------------
 #' @export
@@ -437,9 +434,7 @@ as.POSIXct.grates_yearweek <- function(x, tz = "UTC", ...) {
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
     }
-
-    firstday <- .firstday_from_class(x)
-    x <- as.double(unclass(x)) * 7 + (firstday - 4)
+    x <- unclass(as.Date.grates_yearweek(x))
     .POSIXct(x * 86400, tz = "UTC")
 }
 
@@ -452,8 +447,7 @@ as.POSIXlt.grates_yearweek <- function(x, tz = "UTC", ...) {
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
     }
-    firstday <- .firstday_from_class(x)
-    x <- as.double(unclass(x)) * 7 + (firstday - 4)
+    x <- unclass(as.Date.grates_yearweek(x))
     as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 
@@ -653,13 +647,12 @@ is.numeric.grates_yearweek <- function(x) {
         return(5L)
     if (inherits(x, "grates_yearweek_saturday"))
         return(6L)
-    if (inherits(x, "grates_yearweek_sunday"))
+    if (inherits(x, "grates_yearweek_sunday") || inherits(x, "grates_epiweek"))
         return(7L)
     stop("Invalid <grates_yearweek> object - class corrupted.")
 }
 
 # -------------------------------------------------------------------------
-#' @importFrom fastymd fymd
 .yearweek <- function(year, week, firstday) {
     na_values <- is.na(year) | is.na(week)
     invalid <- !logical(length(na_values))
@@ -674,18 +667,16 @@ is.numeric.grates_yearweek <- function(x) {
         )
     }
 
-
     out <- rep.int(NA_integer_, length(year))
 
     if (!all(invalid)) {
         year <- year[!invalid]
         week <- week[!invalid]
         # convert numeric values to date
-        jan4 <- fymd(year, 1, 4)
+        jan4 <- fastymd::fymd(year, 1, 4)
         # shift the date to start at the first week of the year
-        date <- jan4 - (.wday_relative_to_firstday(jan4, firstday = firstday) - 1)
-        res <- date + (week - 1) * 7L
-        res <- as_yearweek.Date(res, firstday = firstday)
+        year_start <- as.Date.grates_yearweek(as_yearweek.Date(jan4, firstday))
+        res <- as_yearweek.Date(year_start + (week - 1L) * 7L)
         out[!invalid] <- res
     }
 
@@ -693,24 +684,7 @@ is.numeric.grates_yearweek <- function(x) {
 }
 
 # -------------------------------------------------------------------------
-#' @importFrom fastymd fymd
 .last_week_in_year <- function(year = integer(), firstday = 1L) {
-    dec28 <- fymd(year, 12, 28)
-    wday <- .wday_relative_to_firstday(dec28, firstday = firstday)
-    midweek <- dec28 + (4L - wday)
-    .seven_day_week_in_year(date = midweek)
-}
-
-# -------------------------------------------------------------------------
-#' @importFrom fastymd fymd get_year
-.seven_day_week_in_year <- function(date) {
-    yr <- get_year(date)
-    jan1 <- fymd(yr, 1, 1)
-    1 + (unclass(date) - unclass(jan1)) %/% 7
-}
-
-.wday_relative_to_firstday <- function(date, firstday) {
-    # firstday = 1
-    date <- (unclass(date) + 4L) %% 7L
-    1L + (unclass(date) + (7L - firstday)) %% 7L
+    dec28 <- fastymd::fymd(year, 12, 28)
+    fastymd::get_yearweekday_week(dec28, firstday = firstday)
 }

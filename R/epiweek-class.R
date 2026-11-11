@@ -138,10 +138,7 @@ as_epiweek.default <- function(x, ...) {
 #' @rdname epiweek_class
 #' @export
 as_epiweek.Date <- function(x, ...) {
-    firstday <- 7L
-    x <- as.integer(floor(unclass(x)))
-    x <- (x + 4L - firstday) %/% 7L
-    .new_epiweek(x = x)
+    .Call(C_as_grouped_week_from_date, x, "grates_epiweek", 7L)
 }
 
 # -------------------------------------------------------------------------
@@ -311,7 +308,7 @@ as.double.grates_yearweek <- function(x, ...) {
 # -------------------------------------------------------------------------
 #' @export
 as.Date.grates_epiweek <- function(x, ...) {
-    .Date(as.double(unclass(x)) * 7 + 3)
+    .Call(C_as_date_from_epiweek, x)
 }
 
 # -------------------------------------------------------------------------
@@ -322,7 +319,7 @@ as.POSIXct.grates_epiweek <- function(x, tz = "UTC", ...) {
             "<grates_epiweek> objects can only be converted to UTC. ",
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
-    x <- as.double(unclass(x)) * 7 + 3
+    x <- unclass(as.Date.grates_epiweek(x))
     .POSIXct(x * 86400, tz = "UTC")
 }
 
@@ -334,7 +331,7 @@ as.POSIXlt.grates_epiweek <- function(x, tz = "UTC", ...) {
             "<grates_epiweek> objects can only be converted to UTC. ",
             "If other timezones are required, first convert to <Date> and then proceed as desired."
         )
-    x <- as.double(unclass(x)) * 7 + 3
+    x <- unclass(as.Date.grates_epiweek(x))
     as.POSIXlt(.POSIXct(x * 86400, tz = "UTC"), tz = "UTC")
 }
 
