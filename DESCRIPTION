@@ -1,6 +1,6 @@
 Package: grates
 Title: Grouped Date Classes
-Version: 1.8.1
+Version: 1.8.2
 Authors@R: 
     c(
       person(
@@ -28,8 +28,8 @@ Config/testthat/start-first: plots, refactoring
 Imports: utils, fastymd (>= 0.2.0)
 Config/roxygen2/version: 8.1.1
 NeedsCompilation: yes
-Packaged: 2026-11-11 08:52:00 UTC; tim
+Packaged: 2026-11-11 10:30:42 UTC; tim
 Author: Tim Taylor [aut, cre] (ORCID: <https://orcid.org/0000-0002-8587-7113>)
 Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
 Repository: CRAN
-Date/Publication: 2026-11-11 09:50:02 UTC
+Date/Publication: 2026-11-13 11:40:02 UTC
